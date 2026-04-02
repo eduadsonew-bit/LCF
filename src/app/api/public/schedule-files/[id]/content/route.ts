@@ -15,25 +15,13 @@ export async function GET(
       return NextResponse.json({ error: 'Archivo no encontrado' }, { status: 404 });
     }
 
-    const response: {
-      type: 'pdf' | 'excel';
-      name: string;
-      fileName: string;
-      fileData?: string;
-      sheets?: { name: string; data: Record<string, unknown>[]; headers: string[] }[];
-      error?: string;
-    } = {
-      type: file.fileType === 'pdf' ? 'pdf' : 'excel',
+    const response = {
+      type: 'pdf',
       name: file.name,
       fileName: file.fileName,
+      fileData: file.fileData,
+      fileType: file.fileType,
     };
-
-    if (file.fileType === 'pdf') {
-      response.fileData = file.fileData;
-    } else {
-      // For Excel files, return the base64 data
-      response.fileData = file.fileData;
-    }
 
     return NextResponse.json(response);
   } catch (error) {

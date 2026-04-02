@@ -144,7 +144,7 @@ model ScheduleFile {
   id          String   @id @default(cuid())
   name        String
   fileName    String
-  fileType    String   // "xlsx" or "pdf"
+  fileType    String   // "pdf"
   fileData    String   // Base64 encoded file data
   description String?
   active      Boolean  @default(true)

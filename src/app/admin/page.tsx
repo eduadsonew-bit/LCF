@@ -466,13 +466,12 @@ export default function AdminPage() {
     window.location.href = '/';
   };
 
-  // Handle file selection
+  // Handle file selection (now for PDF)
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const allowedTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel'];
-      if (!allowedTypes.includes(file.type)) {
-        alert('Solo se permiten archivos PDF o Excel (.xlsx, .xls)');
+      if (file.type !== 'application/pdf') {
+        alert('Solo se permiten archivos PDF');
         return;
       }
       setSelectedFile(file);
@@ -480,10 +479,10 @@ export default function AdminPage() {
     }
   };
 
-  // Handle file upload
+  // Handle file upload (now for PDF)
   const handleFileUpload = async () => {
     if (!selectedFile || !uploadForm.name) {
-      alert('Por favor selecciona un archivo y proporciona un nombre');
+      alert('Por favor selecciona un archivo PDF y proporciona un nombre');
       return;
     }
 
@@ -492,7 +491,6 @@ export default function AdminPage() {
       const reader = new FileReader();
       reader.onload = async () => {
         const base64 = reader.result as string;
-        const fileType = selectedFile.type === 'application/pdf' ? 'pdf' : 'xlsx';
 
         const res = await fetch('/api/admin/schedule-file', {
           method: 'POST',
@@ -500,7 +498,7 @@ export default function AdminPage() {
           body: JSON.stringify({
             name: uploadForm.name,
             fileName: selectedFile.name,
-            fileType,
+            fileType: 'pdf',
             fileData: base64,
             description: uploadForm.description,
           }),
@@ -572,9 +570,8 @@ export default function AdminPage() {
   const handleStatsFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const allowedTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel'];
-      if (!allowedTypes.includes(file.type)) {
-        alert('Solo se permiten archivos PDF o Excel (.xlsx, .xls)');
+      if (file.type !== 'application/pdf') {
+        alert('Solo se permiten archivos PDF');
         return;
       }
       setStatsSelectedFile(file);
@@ -585,7 +582,7 @@ export default function AdminPage() {
   // Handle statistics file upload
   const handleStatsFileUpload = async () => {
     if (!statsSelectedFile || !statsUploadForm.name) {
-      alert('Por favor selecciona un archivo y proporciona un nombre');
+      alert('Por favor selecciona un archivo PDF y proporciona un nombre');
       return;
     }
 
@@ -594,7 +591,6 @@ export default function AdminPage() {
       const reader = new FileReader();
       reader.onload = async () => {
         const base64 = reader.result as string;
-        const fileType = statsSelectedFile.type === 'application/pdf' ? 'pdf' : 'xlsx';
 
         const res = await fetch('/api/admin/statistics-file', {
           method: 'POST',
@@ -602,7 +598,7 @@ export default function AdminPage() {
           body: JSON.stringify({
             name: statsUploadForm.name,
             fileName: statsSelectedFile.name,
-            fileType,
+            fileType: 'pdf',
             fileData: base64,
             description: statsUploadForm.description,
           }),
@@ -1601,16 +1597,18 @@ export default function AdminPage() {
 
           <TabsContent value="torneos">{renderDataList(tournaments.filter(t => t.image) as EditableItem[], 'tournament')}</TabsContent>
           <TabsContent value="partidos">
-            {/* File Upload Section */}
             <div className="bg-white rounded-xl shadow p-6">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h3 className="text-lg font-bold text-gray-800">Archivos de Programación</h3>
-                  <p className="text-sm text-gray-500">Sube archivos Excel o PDF con la programación de partidos</p>
+                  <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+                    <Calendar className="h-5 w-5 text-green-600" />
+                    Programación de Partidos
+                  </h3>
+                  <p className="text-sm text-gray-500">Sube archivos PDF con la programación de partidos</p>
                 </div>
                 <Button onClick={() => setUploadDialogOpen(true)} className="bg-green-600 hover:bg-green-700">
                   <Upload className="h-4 w-4 mr-2" />
-                  Subir Archivo
+                  Subir PDF
                 </Button>
               </div>
 
@@ -1620,19 +1618,22 @@ export default function AdminPage() {
                     <Card key={file.id} className="overflow-hidden hover:shadow-lg transition-shadow">
                       <CardContent className="p-4">
                         <div className="flex items-start gap-3">
-                          <div className="w-12 h-12 rounded-lg bg-green-100 flex items-center justify-center flex-shrink-0">
-                            {file.fileType === 'pdf' ? (
-                              <File className="h-6 w-6 text-red-600" />
-                            ) : (
-                              <File className="h-6 w-6 text-green-600" />
-                            )}
+                          <div className="w-12 h-12 rounded-lg bg-red-100 flex items-center justify-center flex-shrink-0">
+                            <File className="h-6 w-6 text-red-600" />
                           </div>
                           <div className="flex-1 min-w-0">
                             <h4 className="font-semibold text-gray-800 truncate">{file.name}</h4>
                             <p className="text-xs text-gray-500 truncate">{file.fileName}</p>
                             {file.description && (
-                              <p className="text-xs text-gray-400 mt-1 line-clamp-1">{file.description}</p>
+                              <p className="text-xs text-gray-400 mt-1 line-clamp-2">{file.description}</p>
                             )}
+                            <p className="text-xs text-gray-400 mt-1">
+                              {new Date(file.createdAt).toLocaleDateString('es-ES', {
+                                day: 'numeric',
+                                month: 'short',
+                                year: 'numeric'
+                              })}
+                            </p>
                           </div>
                         </div>
                         <div className="flex gap-2 mt-4">
@@ -1662,95 +1663,118 @@ export default function AdminPage() {
                 <div className="text-center py-8 bg-gray-50 rounded-lg">
                   <File className="h-12 w-12 text-gray-300 mx-auto mb-3" />
                   <p className="text-gray-500">No hay archivos de programación</p>
-                  <p className="text-sm text-gray-400">Sube un archivo Excel o PDF para comenzar</p>
+                  <p className="text-sm text-gray-400 mt-1">Sube un archivo PDF para comenzar</p>
                 </div>
               )}
             </div>
           </TabsContent>
           <TabsContent value="noticias">
+            {/* Botón para agregar noticia */}
+            <div className="flex justify-end mb-6">
+              <Button 
+                onClick={() => openAddDialog('news')}
+                className="bg-green-600 hover:bg-green-700 text-white"
+              >
+                <Plus className="h-4 w-4 mr-2" /> Agregar Noticia
+              </Button>
+            </div>
+            
             <section className="bg-gradient-to-br from-green-600 to-green-800 py-12 text-white rounded-xl">
               <div className="container mx-auto px-4">
-                {infoCards.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {infoCards.slice(0, 3).map((card) => {
-                      // Determinar el gradiente según el color
-                      const gradientClass = 
-                        card.color === 'green' ? 'bg-gradient-to-br from-green-500 to-green-700' :
-                        card.color === 'orange' ? 'bg-gradient-to-br from-amber-500 to-orange-600' :
-                        card.color === 'purple' ? 'bg-gradient-to-br from-purple-500 to-purple-700' :
-                        'bg-gradient-to-br from-green-500 to-green-700';
-                      
-                      // Determinar el icono
-                      const IconComponent = 
-                        card.icon === 'trophy' ? Trophy :
-                        card.icon === 'calendar' ? Calendar :
-                        card.icon === 'file-text' ? FileText :
-                        Trophy;
-
-                      return (
-                        <Card key={card.id} className="group overflow-hidden hover:shadow-xl transition-all duration-300 border-0 text-white relative">
-                          <div className={`absolute inset-0 ${gradientClass}`}></div>
-                          <CardContent className="relative p-8 text-center">
-                            <div className="w-16 h-16 mx-auto mb-4 bg-white/20 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
-                              <IconComponent className="h-8 w-8 text-white" />
-                            </div>
-                            <h3 className="text-xl font-bold mb-3">{card.title}</h3>
-                            <p className="text-white/80 text-sm mb-4">
-                              {card.description}
-                            </p>
-                            <div className="flex justify-center gap-2 mt-4">
-                              <Button 
-                                size="sm" 
-                                variant="outline" 
-                                className="bg-white/20 border-white/30 text-white hover:bg-white/30"
-                                onClick={() => openEditDialog(card, 'infocard')}
-                              >
-                                <Edit className="h-4 w-4 mr-1" /> Editar
-                              </Button>
-                              <Button 
-                                size="sm" 
-                                variant="destructive" 
-                                className="bg-red-500/80 hover:bg-red-600"
-                                onClick={() => openDeleteDialog(card, 'infocard')}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      );
-                    })}
+                {news.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {news.map((item) => (
+                      <Card key={item.id} className="group overflow-hidden hover:shadow-xl transition-all duration-300 bg-white text-gray-800">
+                        {item.image && (
+                          <div className="relative h-40 overflow-hidden">
+                            <img 
+                              src={item.image} 
+                              alt={item.title}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            />
+                          </div>
+                        )}
+                        <CardContent className="p-5">
+                          <div className="flex gap-2 mb-3">
+                            {item.published && (
+                              <Badge className="bg-green-500 text-white text-xs">Publicado</Badge>
+                            )}
+                            {item.featured && (
+                              <Badge className="bg-yellow-500 text-white text-xs">Destacado</Badge>
+                            )}
+                            {!item.published && (
+                              <Badge variant="secondary" className="text-xs">Borrador</Badge>
+                            )}
+                          </div>
+                          <h3 className="text-lg font-bold mb-2 line-clamp-2">{item.title}</h3>
+                          <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+                            {item.summary || item.content?.substring(0, 100)}
+                          </p>
+                          {item.author && (
+                            <p className="text-xs text-gray-500 mb-3">Por: {item.author}</p>
+                          )}
+                          <div className="flex justify-center gap-2 mt-4">
+                            <Button 
+                              size="sm" 
+                              variant="outline" 
+                              onClick={() => openEditDialog(item, 'news')}
+                            >
+                              <Edit className="h-4 w-4 mr-1" /> Editar
+                            </Button>
+                            <Button 
+                              size="sm" 
+                              variant="destructive" 
+                              onClick={() => openDeleteDialog(item, 'news')}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
                   </div>
                 ) : (
                   <div className="text-center py-12 bg-white/10 rounded-xl">
-                    <Trophy className="h-16 w-16 text-green-200 mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold">No hay tarjetas de información</h3>
+                    <FileText className="h-16 w-16 text-green-200 mx-auto mb-4" />
+                    <h3 className="text-xl font-semibold">No hay noticias</h3>
+                    <p className="text-green-100 mt-2">Haz clic en "Agregar Noticia" para crear una nueva</p>
                   </div>
                 )}
               </div>
             </section>
           </TabsContent>
           <TabsContent value="eventos">
+            {/* Botón para agregar evento */}
+            <div className="flex justify-end mb-6">
+              <Button 
+                onClick={() => openAddDialog('event')}
+                className="bg-green-600 hover:bg-green-700 text-white"
+              >
+                <Plus className="h-4 w-4 mr-2" /> Agregar Evento
+              </Button>
+            </div>
+            
             <section className="bg-gradient-to-br from-green-600 to-green-800 py-12 text-white rounded-xl">
               <div className="container mx-auto px-4">
                 {events.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {events.slice(0, 3).map((event) => (
-                      <Card key={event.id} className="bg-white/10 backdrop-blur-sm border-white/20 text-white hover:bg-white/20 transition-all">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {events.map((event) => (
+                      <Card key={event.id} className="group overflow-hidden hover:shadow-xl transition-all duration-300 bg-white text-gray-800">
                         <CardContent className="p-5">
+                          {/* Badge */}
                           {event.eventType && (
-                            <Badge variant="secondary" className="mb-3 bg-white/20 text-white">
+                            <Badge variant="secondary" className="mb-3 bg-green-100 text-green-800">
                               {event.eventType}
                             </Badge>
                           )}
-                          <h3 className="text-xl font-bold mb-2">{event.title}</h3>
-                          <p className="text-green-100 text-sm mb-4 line-clamp-2">
+                          <h3 className="text-lg font-bold mb-2 line-clamp-2">{event.title}</h3>
+                          <p className="text-gray-600 text-sm mb-3 line-clamp-2">
                             {event.description}
                           </p>
-                          <div className="space-y-2 text-sm text-green-100">
+                          <div className="space-y-2 text-sm text-gray-600 mb-4">
                             {event.date && (
                               <div className="flex items-center">
-                                <Clock className="h-4 w-4 mr-2" />
+                                <Clock className="h-4 w-4 mr-2 text-green-600" />
                                 {new Date(event.date).toLocaleDateString('es-ES', {
                                   weekday: 'short',
                                   day: 'numeric',
@@ -1762,16 +1786,15 @@ export default function AdminPage() {
                             )}
                             {event.location && (
                               <div className="flex items-center">
-                                <MapPin className="h-4 w-4 mr-2" />
+                                <MapPin className="h-4 w-4 mr-2 text-green-600" />
                                 {event.location}
                               </div>
                             )}
                           </div>
-                          <div className="flex gap-2 mt-4">
+                          <div className="flex justify-center gap-2 mt-4">
                             <Button 
                               size="sm" 
                               variant="outline" 
-                              className="bg-white/20 border-white/30 text-white hover:bg-white/30"
                               onClick={() => openEditDialog(event, 'event')}
                             >
                               <Edit className="h-4 w-4 mr-1" /> Editar
@@ -1779,20 +1802,30 @@ export default function AdminPage() {
                             <Button 
                               size="sm" 
                               variant="destructive" 
-                              className="bg-red-500/80 hover:bg-red-600"
                               onClick={() => openDeleteDialog(event, 'event')}
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>
                           </div>
                         </CardContent>
+                        {/* Event image - Bottom */}
+                        {event.image && (
+                          <div className="relative h-40 overflow-hidden">
+                            <img 
+                              src={event.image} 
+                              alt={event.title}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            />
+                          </div>
+                        )}
                       </Card>
                     ))}
                   </div>
                 ) : (
                   <div className="text-center py-12 bg-white/10 rounded-xl">
                     <Calendar className="h-16 w-16 text-green-200 mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold">No hay eventos próximos</h3>
+                    <h3 className="text-xl font-semibold">No hay eventos</h3>
+                    <p className="text-green-100 mt-2">Haz clic en "Agregar Evento" para crear uno nuevo</p>
                   </div>
                 )}
               </div>
@@ -1807,11 +1840,11 @@ export default function AdminPage() {
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <h3 className="text-lg font-bold text-gray-800">Archivos de Estadísticas</h3>
-                  <p className="text-sm text-gray-500">Sube archivos Excel o PDF con las tablas de posiciones y goleadores</p>
+                  <p className="text-sm text-gray-500">Sube archivos PDF con las tablas de posiciones y goleadores</p>
                 </div>
                 <Button onClick={() => setStatsUploadDialogOpen(true)} className="bg-green-600 hover:bg-green-700">
                   <Upload className="h-4 w-4 mr-2" />
-                  Subir Archivo
+                  Subir PDF
                 </Button>
               </div>
 
@@ -1822,11 +1855,7 @@ export default function AdminPage() {
                       <CardContent className="p-4">
                         <div className="flex items-start gap-3">
                           <div className="w-12 h-12 rounded-lg bg-amber-100 flex items-center justify-center flex-shrink-0">
-                            {file.fileType === 'pdf' ? (
-                              <File className="h-6 w-6 text-red-600" />
-                            ) : (
-                              <File className="h-6 w-6 text-amber-600" />
-                            )}
+                            <File className="h-6 w-6 text-amber-600" />
                           </div>
                           <div className="flex-1 min-w-0">
                             <h4 className="font-semibold text-gray-800 truncate">{file.name}</h4>
@@ -1863,7 +1892,7 @@ export default function AdminPage() {
                 <div className="text-center py-8 bg-gray-50 rounded-lg">
                   <BarChart3 className="h-12 w-12 text-gray-300 mx-auto mb-3" />
                   <p className="text-gray-500">No hay archivos de estadísticas</p>
-                  <p className="text-sm text-gray-400">Sube un archivo Excel o PDF para comenzar</p>
+                  <p className="text-sm text-gray-400">Sube un archivo PDF para comenzar</p>
                 </div>
               )}
             </div>
@@ -1967,7 +1996,7 @@ export default function AdminPage() {
                   <div className="text-center py-8 bg-gray-50 rounded-lg">
                     <File className="h-12 w-12 text-gray-300 mx-auto mb-3" />
                     <p className="text-gray-500">No hay cronogramas subidos</p>
-                    <p className="text-sm text-gray-400 mt-2">Sube un archivo PDF o Excel para comenzar</p>
+                    <p className="text-sm text-gray-400 mt-2">Sube un archivo PDF para comenzar</p>
                   </div>
                 )}
               </div>
@@ -1984,7 +2013,7 @@ export default function AdminPage() {
                   </div>
                   <Button onClick={() => setStatsUploadDialogOpen(true)} className="bg-purple-600 hover:bg-purple-700">
                     <Upload className="h-4 w-4 mr-2" />
-                    Subir Archivo
+                    Subir PDF
                   </Button>
                 </div>
                 {statisticsFiles.length > 0 ? (
@@ -2031,7 +2060,7 @@ export default function AdminPage() {
                   <div className="text-center py-8 bg-gray-50 rounded-lg">
                     <BarChart3 className="h-12 w-12 text-gray-300 mx-auto mb-3" />
                     <p className="text-gray-500">No hay archivos de estadísticas</p>
-                    <p className="text-sm text-gray-400 mt-2">Sube un archivo PDF o Excel para comenzar</p>
+                    <p className="text-sm text-gray-400 mt-2">Sube un archivo PDF para comenzar</p>
                   </div>
                 )}
               </div>
@@ -2090,11 +2119,11 @@ export default function AdminPage() {
       <Dialog open={uploadDialogOpen} onOpenChange={setUploadDialogOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Subir Archivo de Programación</DialogTitle>
+            <DialogTitle>Subir Programación de Partidos</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label>Nombre del Archivo</Label>
+              <Label>Nombre del Documento *</Label>
               <Input
                 value={uploadForm.name}
                 onChange={(e) => setUploadForm({ ...uploadForm, name: e.target.value })}
@@ -2106,16 +2135,16 @@ export default function AdminPage() {
               <Textarea
                 value={uploadForm.description}
                 onChange={(e) => setUploadForm({ ...uploadForm, description: e.target.value })}
-                placeholder="Breve descripción del archivo"
+                placeholder="Breve descripción de la programación"
               />
             </div>
             <div className="space-y-2">
-              <Label>Archivo (PDF o Excel)</Label>
+              <Label>Archivo PDF *</Label>
               <input
                 key={fileInputKey}
                 ref={fileInputRef}
                 type="file"
-                accept=".pdf,.xlsx,.xls"
+                accept=".pdf"
                 onChange={handleFileSelect}
                 className="hidden"
               />
@@ -2125,11 +2154,11 @@ export default function AdminPage() {
                 className="w-full"
               >
                 <Upload className="h-4 w-4 mr-2" />
-                {selectedFile ? selectedFile.name : 'Seleccionar Archivo'}
+                {selectedFile ? selectedFile.name : 'Seleccionar Archivo PDF'}
               </Button>
               {selectedFile && (
                 <p className="text-xs text-gray-500 text-center">
-                  Tipo: {selectedFile.type === 'application/pdf' ? 'PDF' : 'Excel'} | Tamaño: {(selectedFile.size / 1024).toFixed(1)} KB
+                  Tamaño: {(selectedFile.size / 1024).toFixed(1)} KB
                 </p>
               )}
             </div>
@@ -2142,7 +2171,7 @@ export default function AdminPage() {
               setFileInputKey(prev => prev + 1);
             }}>Cancelar</Button>
             <Button onClick={handleFileUpload} disabled={!selectedFile || uploading} className="bg-green-600 hover:bg-green-700">
-              {uploading ? 'Subiendo...' : 'Subir Archivo'}
+              {uploading ? 'Subiendo...' : 'Subir PDF'}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -2161,29 +2190,11 @@ export default function AdminPage() {
           </DialogHeader>
           <div className="py-4">
             {previewFile?.fileData && (
-              previewFile.fileType === 'pdf' ? (
-                <iframe
-                  src={previewFile.fileData}
-                  className="w-full h-[70vh] rounded-lg border"
-                  title="PDF Preview"
-                />
-              ) : (
-                <div className="text-center py-12 bg-gray-50 rounded-lg">
-                  <File className="h-16 w-16 text-green-500 mx-auto mb-4" />
-                  <p className="text-gray-700 font-medium">Archivo Excel: {previewFile.fileName}</p>
-                  <p className="text-gray-500 text-sm mt-2">
-                    Los archivos Excel se muestran como vista previa. Descarga el archivo para verlo completo.
-                  </p>
-                  <a
-                    href={previewFile.fileData}
-                    download={previewFile.fileName}
-                    className="inline-flex items-center mt-4 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
-                  >
-                    <File className="h-4 w-4 mr-2" />
-                    Descargar Excel
-                  </a>
-                </div>
-              )
+              <iframe
+                src={previewFile.fileData}
+                className="w-full h-[70vh] rounded-lg border"
+                title="PDF Preview"
+              />
             )}
           </div>
         </DialogContent>
@@ -2213,12 +2224,12 @@ export default function AdminPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label>Archivo (PDF o Excel)</Label>
+              <Label>Archivo PDF *</Label>
               <input
                 key={statsFileInputKey}
                 ref={statsFileInputRef}
                 type="file"
-                accept=".pdf,.xlsx,.xls"
+                accept=".pdf"
                 onChange={handleStatsFileSelect}
                 className="hidden"
               />
@@ -2228,11 +2239,11 @@ export default function AdminPage() {
                 className="w-full"
               >
                 <Upload className="h-4 w-4 mr-2" />
-                {statsSelectedFile ? statsSelectedFile.name : 'Seleccionar Archivo'}
+                {statsSelectedFile ? statsSelectedFile.name : 'Seleccionar Archivo PDF'}
               </Button>
               {statsSelectedFile && (
                 <p className="text-xs text-gray-500 text-center">
-                  Tipo: {statsSelectedFile.type === 'application/pdf' ? 'PDF' : 'Excel'} | Tamaño: {(statsSelectedFile.size / 1024).toFixed(1)} KB
+                  Tamaño: {(statsSelectedFile.size / 1024).toFixed(1)} KB
                 </p>
               )}
             </div>
@@ -2245,7 +2256,7 @@ export default function AdminPage() {
               setStatsFileInputKey(prev => prev + 1);
             }}>Cancelar</Button>
             <Button onClick={handleStatsFileUpload} disabled={!statsSelectedFile || statsUploading} className="bg-green-600 hover:bg-green-700">
-              {statsUploading ? 'Subiendo...' : 'Subir Archivo'}
+              {statsUploading ? 'Subiendo...' : 'Subir PDF'}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -2264,29 +2275,11 @@ export default function AdminPage() {
           </DialogHeader>
           <div className="py-4">
             {statsPreviewFile?.fileData && (
-              statsPreviewFile.fileType === 'pdf' ? (
-                <iframe
-                  src={statsPreviewFile.fileData}
-                  className="w-full h-[70vh] rounded-lg border"
-                  title="PDF Preview"
-                />
-              ) : (
-                <div className="text-center py-12 bg-gray-50 rounded-lg">
-                  <File className="h-16 w-16 text-amber-500 mx-auto mb-4" />
-                  <p className="text-gray-700 font-medium">Archivo Excel: {statsPreviewFile.fileName}</p>
-                  <p className="text-gray-500 text-sm mt-2">
-                    Los archivos Excel se muestran como vista previa. Descarga el archivo para verlo completo.
-                  </p>
-                  <a
-                    href={statsPreviewFile.fileData}
-                    download={statsPreviewFile.fileName}
-                    className="inline-flex items-center mt-4 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
-                  >
-                    <File className="h-4 w-4 mr-2" />
-                    Descargar Excel
-                  </a>
-                </div>
-              )
+              <iframe
+                src={statsPreviewFile.fileData}
+                className="w-full h-[70vh] rounded-lg border"
+                title="PDF Preview"
+              />
             )}
           </div>
         </DialogContent>

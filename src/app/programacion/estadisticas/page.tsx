@@ -1,52 +1,78 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import {
   ChevronRight,
   BarChart3,
   Download,
-  FileSpreadsheet,
   FileText,
   ChevronDown,
-  Table,
+  FolderOpen,
+  Search,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 interface StatisticsFile {
   id: string;
   name: string;
   fileName: string;
   fileType: string;
+  fileData: string | null;
   description: string | null;
   createdAt: string;
-}
-
-interface SheetData {
-  name: string;
-  data: Record<string, unknown>[];
-  headers: string[];
-}
-
-interface FileContent {
-  type: 'pdf' | 'excel';
-  name: string;
-  fileName: string;
-  fileData?: string;
-  sheets?: SheetData[];
-  error?: string;
 }
 
 export default function EstadisticasPage() {
   const [files, setFiles] = useState<StatisticsFile[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedFile, setSelectedFile] = useState<StatisticsFile | null>(null);
-  const [fileContent, setFileContent] = useState<FileContent | null>(null);
-  const [contentLoading, setContentLoading] = useState(false);
-  const [activeSheet, setActiveSheet] = useState(0);
   const [showFileList, setShowFileList] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [blobUrl, setBlobUrl] = useState<string | null>(null);
+
+  // Convert base64 to blob URL for better performance with large files
+  useEffect(() => {
+    // Cleanup previous blob URL
+    if (blobUrl) {
+      URL.revokeObjectURL(blobUrl);
+      setBlobUrl(null);
+    }
+
+    if (!selectedFile?.fileData) {
+      return;
+    }
+
+    try {
+      // Extract the base64 data from data URI
+      const base64Data = selectedFile.fileData.split(',')[1];
+      const byteCharacters = atob(base64Data);
+      const byteNumbers = new Array(byteCharacters.length);
+      
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      setBlobUrl(url);
+    } catch (error) {
+      console.error('Error creating blob URL:', error);
+      // Fallback to original data URI
+      setBlobUrl(selectedFile.fileData);
+    }
+
+    // Cleanup on unmount
+    return () => {
+      if (blobUrl && blobUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(blobUrl);
+      }
+    };
+  }, [selectedFile?.id, selectedFile?.fileData]);
 
   useEffect(() => {
     const fetchFiles = async () => {
@@ -56,7 +82,7 @@ export default function EstadisticasPage() {
         setFiles(data);
 
         if (data.length > 0) {
-          loadFileContent(data[0]);
+          setSelectedFile(data[0]);
         }
       } catch (error) {
         console.error('Error fetching statistics files:', error);
@@ -68,130 +94,84 @@ export default function EstadisticasPage() {
     fetchFiles();
   }, []);
 
-  const loadFileContent = async (file: StatisticsFile) => {
-    setSelectedFile(file);
-    setContentLoading(true);
-    setActiveSheet(0);
-
-    try {
-      const res = await fetch(`/api/public/statistics-files/${file.id}/content`);
-      const data = await res.json();
-      setFileContent(data);
-    } catch (error) {
-      console.error('Error loading file content:', error);
-    } finally {
-      setContentLoading(false);
-    }
-    setShowFileList(false);
-  };
-
-  const handleDownload = () => {
-    if (!fileContent?.fileData) return;
+  const handleDownload = useCallback((file: StatisticsFile) => {
+    if (!file.fileData) return;
 
     const link = document.createElement('a');
-    link.href = fileContent.fileData;
-    link.download = fileContent.fileName;
+    link.href = file.fileData;
+    link.download = file.fileName;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-  };
+  }, []);
 
-  const renderExcelTable = () => {
-    if (!fileContent?.sheets || fileContent.sheets.length === 0) {
+  const selectFile = useCallback((file: StatisticsFile) => {
+    setSelectedFile(file);
+    setShowFileList(false);
+  }, []);
+
+  const formatDate = useCallback((dateString: string) => {
+    return new Date(dateString).toLocaleDateString('es-ES', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    });
+  }, []);
+
+  const filteredFiles = files.filter((file) => {
+    return file.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+           file.fileName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+           (file.description?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false);
+  });
+
+  const renderPDFViewer = () => {
+    if (!selectedFile?.fileData) {
       return (
         <div className="text-center py-12">
-          <FileSpreadsheet className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-          <p className="text-gray-500">No hay datos para mostrar</p>
+          <FileText className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+          <p className="text-gray-500">Este documento no tiene archivo adjunto</p>
         </div>
       );
     }
 
-    const currentSheet = fileContent.sheets[activeSheet];
+    if (!blobUrl) {
+      return (
+        <div className="text-center py-12">
+          <FileText className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+          <p className="text-gray-500">Cargando documento...</p>
+        </div>
+      );
+    }
 
     return (
       <div className="space-y-4">
-        {fileContent.sheets.length > 1 && (
-          <div className="flex gap-2 flex-wrap">
-            {fileContent.sheets.map((sheet, index) => (
-              <Button
-                key={index}
-                variant={index === activeSheet ? "default" : "outline"}
-                size="sm"
-                onClick={() => setActiveSheet(index)}
-                className={index === activeSheet ? "bg-amber-600 hover:bg-amber-700" : "border-amber-500 text-amber-600"}
-              >
-                <Table className="h-4 w-4 mr-2" />
-                {sheet.name}
-              </Button>
-            ))}
+        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-center gap-3">
+          <FileText className="h-8 w-8 text-amber-600" />
+          <div>
+            <p className="font-medium text-amber-800">Documento PDF</p>
+            <p className="text-sm text-amber-600">El archivo se muestra a continuación</p>
           </div>
-        )}
-
-        <div className="overflow-x-auto rounded-lg border border-gray-200">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="bg-amber-600 text-white">
-                {currentSheet.headers.map((header, index) => (
-                  <th key={index} className="px-4 py-3 text-left font-semibold whitespace-nowrap">
-                    {header}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {currentSheet.data.map((row, rowIndex) => (
-                <tr
-                  key={rowIndex}
-                  className={`${rowIndex % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-amber-50 transition-colors`}
-                >
-                  {currentSheet.headers.map((header, cellIndex) => (
-                    <td key={cellIndex} className="px-4 py-3 border-t border-gray-200 whitespace-nowrap">
-                      {String(row[header] ?? '')}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <Button
+            variant="outline"
+            size="sm"
+            className="ml-auto border-amber-300 text-amber-700 hover:bg-amber-100"
+            onClick={() => handleDownload(selectedFile)}
+          >
+            <Download className="h-4 w-4 mr-2" />
+            Descargar
+          </Button>
         </div>
 
-        <p className="text-sm text-gray-500 text-right">
-          {currentSheet.data.length} registros encontrados
-        </p>
+        <div className="rounded-lg border border-gray-200 overflow-hidden bg-gray-100">
+          <iframe
+            src={blobUrl}
+            className="w-full h-[75vh]"
+            title={selectedFile.name}
+          />
+        </div>
       </div>
     );
   };
-
-  const renderPDFViewer = () => (
-    <div className="space-y-4">
-      <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-center gap-3">
-        <FileText className="h-8 w-8 text-amber-600" />
-        <div>
-          <p className="font-medium text-amber-800">Documento PDF</p>
-          <p className="text-sm text-amber-600">El archivo se muestra a continuación</p>
-        </div>
-        <Button
-          variant="outline"
-          size="sm"
-          className="ml-auto border-amber-300 text-amber-700 hover:bg-amber-100"
-          onClick={handleDownload}
-        >
-          <Download className="h-4 w-4 mr-2" />
-          Descargar
-        </Button>
-      </div>
-
-      {fileContent.fileData && (
-        <div className="rounded-lg border border-gray-200 overflow-hidden">
-          <iframe
-            src={fileContent.fileData}
-            className="w-full h-[70vh]"
-            title={fileContent.name}
-          />
-        </div>
-      )}
-    </div>
-  );
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
@@ -216,8 +196,8 @@ export default function EstadisticasPage() {
                 className="bg-white/10 border-white/30 text-white hover:bg-white/20"
                 onClick={() => setShowFileList(!showFileList)}
               >
-                <FileSpreadsheet className="h-4 w-4 mr-2" />
-                Archivos ({files.length})
+                <FolderOpen className="h-4 w-4 mr-2" />
+                Documentos ({files.length})
                 <ChevronDown className={`h-4 w-4 ml-2 transition-transform ${showFileList ? 'rotate-180' : ''}`} />
               </Button>
             </div>
@@ -229,25 +209,34 @@ export default function EstadisticasPage() {
       {showFileList && files.length > 0 && (
         <div className="bg-white border-b shadow-sm">
           <div className="container mx-auto px-4 py-4">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              {files.map((file) => (
+            <div className="mb-4">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Input
+                  placeholder="Buscar documentos..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-h-64 overflow-y-auto">
+              {filteredFiles.map((file) => (
                 <button
                   key={file.id}
-                  onClick={() => loadFileContent(file)}
+                  onClick={() => selectFile(file)}
                   className={`p-3 rounded-lg border-2 text-left transition-all ${
                     selectedFile?.id === file.id
                       ? 'border-amber-500 bg-amber-50'
                       : 'border-gray-200 hover:border-amber-300 hover:bg-gray-50'
                   }`}
                 >
-                  <div className="flex items-center gap-2">
-                    {file.fileType === 'pdf' ? (
-                      <FileText className="h-5 w-5 text-red-500" />
-                    ) : (
-                      <FileSpreadsheet className="h-5 w-5 text-amber-500" />
-                    )}
-                    <span className="font-medium text-sm truncate">{file.name}</span>
+                  <div className="flex items-center gap-2 mb-1">
+                    <FileText className="h-4 w-4 text-amber-500" />
+                    <Badge className="bg-amber-100 text-amber-700 text-xs">PDF</Badge>
                   </div>
+                  <span className="font-medium text-sm truncate block">{file.name}</span>
+                  <span className="text-xs text-gray-500">{file.fileName}</span>
                 </button>
               ))}
             </div>
@@ -257,7 +246,7 @@ export default function EstadisticasPage() {
 
       {/* Main Content */}
       <main className="flex-grow container mx-auto px-4 py-6">
-        {loading || contentLoading ? (
+        {loading ? (
           <Card>
             <CardContent className="p-6">
               <div className="animate-pulse space-y-4">
@@ -266,62 +255,49 @@ export default function EstadisticasPage() {
               </div>
             </CardContent>
           </Card>
-        ) : fileContent ? (
+        ) : selectedFile ? (
           <div className="space-y-4">
+            {/* Info del archivo seleccionado */}
             <Card className="border-l-4 border-l-amber-500">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between flex-wrap gap-4">
                   <div className="flex items-center gap-4">
-                    {fileContent.type === 'pdf' ? (
-                      <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
-                        <FileText className="h-6 w-6 text-red-600" />
-                      </div>
-                    ) : (
-                      <div className="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center">
-                        <FileSpreadsheet className="h-6 w-6 text-amber-600" />
-                      </div>
-                    )}
+                    <div className="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center">
+                      <FileText className="h-6 w-6 text-amber-600" />
+                    </div>
                     <div>
-                      <h2 className="font-bold text-lg text-gray-800">{fileContent.name}</h2>
-                      <div className="flex items-center gap-2">
-                        <Badge className={fileContent.type === 'pdf' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'}>
-                          {fileContent.type === 'pdf' ? 'PDF' : 'Excel'}
+                      <h2 className="font-bold text-lg text-gray-800">{selectedFile.name}</h2>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <Badge className="bg-amber-100 text-amber-700">
+                          PDF
                         </Badge>
-                        <span className="text-sm text-gray-500">{fileContent.fileName}</span>
+                        <span className="text-sm text-gray-500">{selectedFile.fileName}</span>
+                        <span className="text-sm text-gray-400">•</span>
+                        <span className="text-sm text-gray-500">{formatDate(selectedFile.createdAt)}</span>
                       </div>
                     </div>
                   </div>
-                  {fileContent.type === 'excel' && (
+                  {selectedFile.fileData && (
                     <Button
                       variant="outline"
                       className="border-amber-500 text-amber-600 hover:bg-amber-50"
-                      onClick={handleDownload}
+                      onClick={() => handleDownload(selectedFile)}
                     >
                       <Download className="h-4 w-4 mr-2" />
-                      Descargar Excel
+                      Descargar PDF
                     </Button>
                   )}
                 </div>
+                {selectedFile.description && (
+                  <p className="mt-3 text-gray-600 text-sm">{selectedFile.description}</p>
+                )}
               </CardContent>
             </Card>
 
+            {/* PDF Viewer */}
             <Card>
               <CardContent className="p-6">
-                {fileContent.type === 'pdf'
-                  ? renderPDFViewer()
-                  : fileContent.error
-                    ? (
-                      <div className="text-center py-12">
-                        <FileSpreadsheet className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-                        <p className="text-gray-500 mb-4">{fileContent.error}</p>
-                        <Button onClick={handleDownload} className="bg-amber-600 hover:bg-amber-700">
-                          <Download className="h-4 w-4 mr-2" />
-                          Descargar archivo
-                        </Button>
-                      </div>
-                    )
-                    : renderExcelTable()
-                }
+                {renderPDFViewer()}
               </CardContent>
             </Card>
           </div>

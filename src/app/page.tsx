@@ -647,9 +647,7 @@ export default function HomePage() {
                           key={event.id} 
                           className="group relative bg-white rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2"
                         >
-                          {/* Decorative top bar */}
-                          <div className={`h-2 bg-gradient-to-r ${gradientClass}`}></div>
-                          
+                          {/* Content - Text First */}
                           <div className="p-6">
                             {/* Badge and icon row */}
                             <div className="flex items-center justify-between mb-4">
@@ -663,7 +661,7 @@ export default function HomePage() {
                               </div>
                             </div>
                             
-                            {/* Content */}
+                            {/* Title and Description */}
                             <h3 className="text-xl font-bold mb-3 text-gray-800 group-hover:text-green-700 transition-colors">
                               {event.title}
                             </h3>
@@ -692,8 +690,22 @@ export default function HomePage() {
                             </div>
                           </div>
                           
+                          {/* Event Image - Bottom */}
+                          {event.image ? (
+                            <div className="relative h-40 overflow-hidden">
+                              <img
+                                src={event.image}
+                                alt={event.title}
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                              />
+                              <div className={`absolute inset-0 bg-gradient-to-t ${gradientClass} opacity-20`}></div>
+                            </div>
+                          ) : (
+                            <div className={`h-4 bg-gradient-to-r ${gradientClass}`}></div>
+                          )}
+                          
                           {/* Bottom decorative corner */}
-                          <div className={`absolute bottom-0 right-0 w-24 h-24 bg-gradient-to-tl ${gradientClass} opacity-10 rounded-tl-full`}></div>
+                          <div className={`absolute bottom-0 right-0 w-24 h-24 bg-gradient-to-tl ${gradientClass} opacity-10 rounded-tl-full pointer-events-none`}></div>
                         </div>
                       );
                     })}
