@@ -86,6 +86,7 @@ interface InfoCard {
   id: string;
   title: string;
   description: string | null;
+  image: string | null;
   icon: string | null;
   link: string | null;
   linkText: string | null;
@@ -568,43 +569,47 @@ export default function HomePage() {
                           className="group relative"
                         >
                           <div className="bg-white rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 relative">
-                            {/* Barra superior decorativa */}
+                            {/* Imagen de la noticia */}
+                            {card.image ? (
+                              <div className="relative h-28 overflow-hidden">
+                                <img
+                                  src={card.image}
+                                  alt={card.title}
+                                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                />
+                                <div className={`absolute inset-0 bg-gradient-to-t ${colors.gradient} opacity-20`}></div>
+                              </div>
+                            ) : (
+                              <div className={`h-28 bg-gradient-to-br ${colors.gradient} flex items-center justify-center`}>
+                                <IconComponent className="h-12 w-12 text-white/50" />
+                              </div>
+                            )}
+                            
+                            {/* Barra decorativa */}
                             <div className={`h-2 bg-gradient-to-r ${colors.gradient}`}></div>
                             
                             {/* Contenido principal */}
-                            <div className="p-8 relative">
-                              {/* Icono con animación */}
-                              <div className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${colors.gradient} flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 group-hover:rotate-6 transition-all duration-300`}>
-                                <IconComponent className="h-10 w-10 text-white" />
-                              </div>
-                              
+                            <div className="p-6 relative">
                               {/* Número de noticia decorativo */}
-                              <span className={`absolute top-8 right-8 text-6xl font-black ${colors.bg} ${colors.accent} opacity-20`}>
+                              <span className={`absolute top-4 right-4 text-4xl font-black ${colors.bg} ${colors.accent} opacity-20`}>
                                 0{index + 1}
                               </span>
                               
                               {/* Título */}
-                              <h3 className="text-2xl font-bold mb-4 text-gray-800 group-hover:text-green-700 transition-colors leading-tight">
+                              <h3 className="text-xl font-bold mb-3 text-gray-800 group-hover:text-green-700 transition-colors leading-tight line-clamp-2">
                                 {card.title}
                               </h3>
                               
                               {/* Descripción */}
-                              <p className="text-gray-600 leading-relaxed line-clamp-3 mb-6">
-                                {card.description}
-                              </p>
-                              
-                              {/* Botón Leer más */}
-                              <div className="flex items-center gap-2">
-                                <span className={`font-semibold ${colors.accent}`}>
-                                  Leer más
-                                </span>
-                                <ArrowRight className={`h-5 w-5 ${colors.accent} group-hover:translate-x-2 transition-transform duration-300`} />
-                              </div>
+                              {card.description && (
+                                <p className="text-gray-600 text-sm leading-relaxed line-clamp-3">
+                                  {card.description}
+                                </p>
+                              )}
                             </div>
                             
                             {/* Decoraciones */}
-                            <div className={`absolute bottom-0 right-0 w-32 h-32 bg-gradient-to-tl ${colors.gradient} opacity-5 rounded-tl-full`}></div>
-                            <div className={`absolute top-0 left-0 w-1 h-full bg-gradient-to-b ${colors.gradient} opacity-30`}></div>
+                            <div className={`absolute bottom-0 right-0 w-24 h-24 bg-gradient-to-tl ${colors.gradient} opacity-5 rounded-tl-full`}></div>
                           </div>
                         </div>
                       );

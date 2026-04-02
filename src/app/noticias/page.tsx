@@ -20,6 +20,7 @@ interface InfoCard {
   id: string;
   title: string;
   description: string | null;
+  image: string | null;
   icon: string | null;
   link: string | null;
   linkText: string | null;
@@ -31,25 +32,18 @@ interface InfoCard {
 function CardSkeleton() {
   return (
     <div className="group relative bg-white rounded-2xl overflow-hidden shadow-xl">
+      {/* Image skeleton */}
+      <div className="h-48 bg-gray-200 animate-pulse"></div>
+      
       {/* Decorative top bar skeleton */}
       <div className="h-2 bg-gray-200 animate-pulse"></div>
       
-      <div className="p-8">
-        {/* Icon skeleton */}
-        <div className="w-16 h-16 rounded-2xl bg-gray-200 animate-pulse mb-6"></div>
-        
+      <div className="p-6">
         {/* Title skeleton */}
-        <div className="h-6 bg-gray-200 rounded animate-pulse mb-3 w-3/4"></div>
-        
-        {/* Description skeleton */}
-        <div className="space-y-2">
-          <div className="h-4 bg-gray-200 rounded animate-pulse w-full"></div>
-          <div className="h-4 bg-gray-200 rounded animate-pulse w-5/6"></div>
-          <div className="h-4 bg-gray-200 rounded animate-pulse w-4/6"></div>
-        </div>
+        <div className="h-6 bg-gray-200 rounded animate-pulse mb-2 w-3/4"></div>
         
         {/* Date skeleton */}
-        <div className="mt-6 h-4 bg-gray-200 rounded animate-pulse w-1/3"></div>
+        <div className="mt-4 h-4 bg-gray-200 rounded animate-pulse w-1/3"></div>
       </div>
     </div>
   );
@@ -173,22 +167,30 @@ export default function NoticiasPage() {
                       key={card.id}
                       className="group relative bg-white rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2"
                     >
+                      {/* Image */}
+                      {card.image ? (
+                        <div className="relative h-48 overflow-hidden">
+                          <img
+                            src={card.image}
+                            alt={card.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          />
+                          <div className={`absolute inset-0 bg-gradient-to-t ${gradientClass} opacity-20`}></div>
+                        </div>
+                      ) : (
+                        <div className={`h-48 bg-gradient-to-br ${gradientClass} flex items-center justify-center`}>
+                          <IconComponent className="h-16 w-16 text-white/50" />
+                        </div>
+                      )}
+                      
                       {/* Decorative top bar */}
                       <div className={`h-2 bg-gradient-to-r ${gradientClass}`}></div>
                       
-                      <div className="p-8">
-                        {/* Icon */}
-                        <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${gradientClass} flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                          <IconComponent className="h-8 w-8 text-white" />
-                        </div>
-                        
+                      <div className="p-6">
                         {/* Content */}
-                        <h3 className="text-xl font-bold mb-3 text-gray-800 group-hover:text-green-700 transition-colors">
+                        <h3 className="text-xl font-bold mb-2 text-gray-800 group-hover:text-green-700 transition-colors line-clamp-2">
                           {card.title}
                         </h3>
-                        <p className="text-gray-600 text-sm leading-relaxed line-clamp-3">
-                          {card.description}
-                        </p>
                         
                         {/* Date Badge */}
                         {card.createdAt && (
@@ -199,12 +201,6 @@ export default function NoticiasPage() {
                             </Badge>
                           </div>
                         )}
-                        
-                        {/* Read more indicator */}
-                        <div className="mt-6 flex items-center text-green-600 font-medium text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                          <span>Leer más</span>
-                          <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                        </div>
                       </div>
                       
                       {/* Bottom decorative corner */}

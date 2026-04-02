@@ -18,3 +18,4 @@ Error: listen EADDRINUSE: address already in use :::3000
 }
 [?25h
 Server exited with code: 1
+error: script "dev" was terminated by signal SIGTERM (Polite quit request)

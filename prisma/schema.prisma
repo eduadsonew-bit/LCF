@@ -107,6 +107,7 @@ model InfoCard {
   id          String   @id @default(cuid())
   title       String
   description String?
+  image       String?  // URL de la imagen de la noticia
   icon        String?  // trophy, calendar, file-text, users, etc.
   link        String?
   linkText    String?

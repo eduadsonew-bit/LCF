@@ -112,6 +112,7 @@ interface InfoCard {
   id: string;
   title: string;
   description: string | null;
+  image: string | null;
   icon: string | null;
   link: string | null;
   linkText: string | null;
@@ -739,6 +740,10 @@ export default function DevAdminPage() {
               <Label>Descripción</Label>
               <Textarea value={form.description as string || ''} onChange={(e) => handleChange('description', e.target.value)} />
             </div>
+            <div className="space-y-2">
+              <Label>URL de Imagen</Label>
+              <Input value={form.image as string || ''} onChange={(e) => handleChange('image', e.target.value)} placeholder="https://..." />
+            </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Icono</Label>
@@ -937,7 +942,7 @@ export default function DevAdminPage() {
       }
       case 'infocard': {
         const ic = item as InfoCard;
-        return getBasicCard(ic.title, ic.description || '', null, <Badge variant={ic.active ? 'default' : 'secondary'}>{ic.active ? 'Activo' : 'Inactivo'}</Badge>);
+        return getBasicCard(ic.title, ic.description || '', ic.image, <Badge variant={ic.active ? 'default' : 'secondary'}>{ic.active ? 'Activo' : 'Inactivo'}</Badge>);
       }
       case 'gallery': {
         const g = item as GalleryItem;

@@ -9,6 +9,7 @@ export async function POST(request: NextRequest) {
       data: {
         title: data.title,
         description: data.description,
+        image: data.image,
         icon: data.icon,
         link: data.link,
         linkText: data.linkText,
