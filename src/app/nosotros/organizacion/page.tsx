@@ -33,17 +33,45 @@ function ComisionesCard() {
     },
     {
       nombre: "Comisión Disciplinaria de Torneos",
-      descripcion: "Responsible de la disciplina en los torneos oficiales"
+      descripcion: "Responsable de la disciplina en los torneos oficiales"
     },
     {
       nombre: "Comisión de Apelaciones",
       descripcion: "Órgano de revisión de decisiones disciplinarias"
+    },
+    {
+      nombre: "Comisión del Estatuto del Jugador",
+      descripcion: "Regula el registro y estatus de los jugadores"
+    },
+    {
+      nombre: "Comisión Técnica",
+      descripcion: "Supervisa aspectos técnicos y deportivos"
+    },
+    {
+      nombre: "Comisión de Juzgamiento",
+      descripcion: "Evalúa y califica el desempeño arbitral"
+    },
+    {
+      nombre: "Comisión de Torneos",
+      descripcion: "Organiza y gestiona los torneos oficiales"
+    },
+    {
+      nombre: "Comisión de Fútbol Femenino",
+      descripcion: "Promueve y desarrolla el fútbol femenino"
+    },
+    {
+      nombre: "Comisión de Fútbol Playa",
+      descripcion: "Desarrolla el fútbol playa en la región"
+    },
+    {
+      nombre: "Comisión de Fútbol Sala",
+      descripcion: "Promueve y organiza el fútbol sala"
     }
   ];
 
   return (
     <div 
-      className={`text-center p-6 bg-blue-50 rounded-xl cursor-pointer transition-all duration-300 ${isExpanded ? 'md:col-span-1 md:row-span-1' : ''}`}
+      className={`text-center p-6 bg-blue-50 rounded-xl cursor-pointer transition-all duration-300 ${isExpanded ? 'md:col-span-3' : ''}`}
       onClick={() => setIsExpanded(!isExpanded)}
     >
       <div className="flex items-center justify-center gap-2">
@@ -61,7 +89,7 @@ function ComisionesCard() {
       <p className="text-blue-600 text-xs font-medium">Click para ver más</p>
       
       {isExpanded && (
-        <div className="mt-4 space-y-3 text-left animate-in fade-in duration-200">
+        <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-left animate-in fade-in duration-200">
           {comisiones.map((comision, index) => (
             <div 
               key={index} 
