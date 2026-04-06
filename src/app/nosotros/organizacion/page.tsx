@@ -183,8 +183,6 @@ export default function OrganizacionPage() {
           <div className="flex items-center gap-2 text-green-200 text-sm mb-3">
             <Link href="/" className="hover:text-white">Inicio</Link>
             <ChevronRight className="h-4 w-4" />
-            <Link href="/nosotros" className="hover:text-white">Nosotros</Link>
-            <ChevronRight className="h-4 w-4" />
             <span className="text-white">Organización</span>
           </div>
           <div className="text-center">
