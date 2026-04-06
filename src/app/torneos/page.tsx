@@ -172,7 +172,7 @@ export default function TorneosPage() {
                       <img
                         src={tournament.image}
                         alt={tournament.name}
-                        className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                     ) : (
                       <div className="w-full h-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center">
