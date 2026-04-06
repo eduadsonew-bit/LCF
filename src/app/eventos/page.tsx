@@ -9,10 +9,17 @@ import {
   Filter,
   ChevronRight,
   ImageIcon,
+  X,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import SiteLayout from "@/components/SiteLayout";
 
 interface Event {
@@ -58,6 +65,7 @@ export default function EventosPage() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedFilter, setSelectedFilter] = useState("all");
+  const [selectedImage, setSelectedImage] = useState<{src: string, alt: string} | null>(null);
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -247,7 +255,10 @@ export default function EventosPage() {
                   </CardContent>
                   
                   {/* Event image - Bottom */}
-                  <div className="relative overflow-hidden bg-gray-100 h-[400px] mt-auto">
+                  <div 
+                    className="relative overflow-hidden bg-gray-100 h-[400px] mt-auto cursor-pointer"
+                    onClick={() => event.image && setSelectedImage({src: event.image, alt: event.title})}
+                  >
                     {event.image ? (
                       <>
                         <img
@@ -292,6 +303,30 @@ export default function EventosPage() {
           </div>
         )}
       </div>
+
+      {/* Image Dialog */}
+      <Dialog open={!!selectedImage} onOpenChange={() => setSelectedImage(null)}>
+        <DialogContent className="max-w-4xl max-h-[90vh] p-0 bg-black/95 border-none">
+          <DialogHeader>
+            <DialogTitle className="sr-only">{selectedImage?.alt || 'Imagen ampliada'}</DialogTitle>
+          </DialogHeader>
+          <button
+            onClick={() => setSelectedImage(null)}
+            className="absolute top-4 right-4 z-10 bg-white/10 hover:bg-white/20 text-white rounded-full p-2 transition-colors"
+          >
+            <X className="h-6 w-6" />
+          </button>
+          {selectedImage && (
+            <div className="relative w-full h-full flex items-center justify-center p-4">
+              <img
+                src={selectedImage.src}
+                alt={selectedImage.alt}
+                className="max-w-full max-h-[80vh] object-contain rounded-lg"
+              />
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </SiteLayout>
   );
 }

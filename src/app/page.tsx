@@ -688,7 +688,10 @@ export default function HomePage() {
                           </div>
                           
                           {/* Event Image - Bottom */}
-                          <div className="relative overflow-hidden bg-gray-100 h-[400px] mt-auto">
+                          <div 
+                            className="relative overflow-hidden bg-gray-100 h-[400px] mt-auto cursor-pointer"
+                            onClick={() => event.image && setSelectedImage({src: event.image, alt: event.title})}
+                          >
                             {event.image ? (
                               <>
                                 <img
