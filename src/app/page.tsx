@@ -692,7 +692,7 @@ export default function HomePage() {
                           
                           {/* Event Image - Bottom */}
                           {event.image ? (
-                            <div className="relative overflow-hidden bg-gray-100 h-[250px]">
+                            <div className="relative overflow-hidden bg-gray-100 h-[400px]">
                               <img
                                 src={event.image}
                                 alt={event.title}
