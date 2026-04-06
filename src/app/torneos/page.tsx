@@ -151,7 +151,7 @@ export default function TorneosPage() {
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {[...Array(8)].map((_, i) => (
               <Card key={i} className="overflow-hidden animate-pulse">
-                <div className="aspect-square bg-gray-200"></div>
+                <div className="h-[350px] bg-gray-200"></div>
                 <div className="p-3 bg-gray-100">
                   <div className="h-4 bg-gray-300 rounded w-16 mx-auto"></div>
                 </div>
@@ -167,7 +167,7 @@ export default function TorneosPage() {
               >
                 <CardContent className="p-0">
                   {/* Imagen */}
-                  <div className="aspect-square bg-gray-100 overflow-hidden">
+                  <div className="h-[350px] bg-gray-100 overflow-hidden">
                     {tournament.image ? (
                       <img
                         src={tournament.image}
