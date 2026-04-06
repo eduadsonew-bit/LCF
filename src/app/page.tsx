@@ -504,7 +504,7 @@ export default function HomePage() {
                     {tournaments.filter(t => t.image).slice(0, 3).map((tournament) => (
                       <div key={tournament.id} className="group flex flex-col items-center">
                         <div 
-                          className="relative overflow-hidden border-2 border-white rounded-lg cursor-pointer flex-1 w-full min-h-[350px]"
+                          className="relative overflow-hidden border-2 border-white rounded-lg cursor-pointer flex-1 w-full min-h-[450px]"
                           onClick={() => tournament.image && setSelectedImage({src: tournament.image, alt: tournament.name})}
                         >
                           {tournament.image ? (
