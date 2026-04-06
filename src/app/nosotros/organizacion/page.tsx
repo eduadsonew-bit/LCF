@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import {
   Users,
@@ -10,13 +11,76 @@ import {
   Award,
   Flag,
   ChevronRight,
+  ChevronDown,
+  ChevronUp,
   Eye,
   Goal,
   Handshake,
   Building2,
+  Scale,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+
+// Componente de Comisiones expandible
+function ComisionesCard() {
+  const [isExpanded, setIsExpanded] = useState(false);
+  
+  const comisiones = [
+    {
+      nombre: "Comisión Disciplinaria de la Liga",
+      descripcion: "Encargada de aplicar el régimen disciplinario de la liga"
+    },
+    {
+      nombre: "Comisión Disciplinaria de Torneos",
+      descripcion: "Responsible de la disciplina en los torneos oficiales"
+    },
+    {
+      nombre: "Comisión de Apelaciones",
+      descripcion: "Órgano de revisión de decisiones disciplinarias"
+    }
+  ];
+
+  return (
+    <div 
+      className={`text-center p-6 bg-blue-50 rounded-xl cursor-pointer transition-all duration-300 ${isExpanded ? 'md:col-span-1 md:row-span-1' : ''}`}
+      onClick={() => setIsExpanded(!isExpanded)}
+    >
+      <div className="flex items-center justify-center gap-2">
+        <Users className="h-10 w-10 text-blue-600 mx-auto mb-4" />
+      </div>
+      <div className="flex items-center justify-center gap-2 mb-2">
+        <h3 className="font-bold text-gray-800">Comisiones</h3>
+        {isExpanded ? (
+          <ChevronUp className="h-5 w-5 text-blue-600" />
+        ) : (
+          <ChevronDown className="h-5 w-5 text-blue-600" />
+        )}
+      </div>
+      <p className="text-gray-600 text-sm mb-2">Áreas especializadas</p>
+      <p className="text-blue-600 text-xs font-medium">Click para ver más</p>
+      
+      {isExpanded && (
+        <div className="mt-4 space-y-3 text-left animate-in fade-in duration-200">
+          {comisiones.map((comision, index) => (
+            <div 
+              key={index} 
+              className="bg-white p-3 rounded-lg shadow-sm border border-blue-100 hover:border-blue-300 transition-colors"
+            >
+              <div className="flex items-start gap-2">
+                <Scale className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                <div>
+                  <h4 className="font-semibold text-gray-800 text-sm">{comision.nombre}</h4>
+                  <p className="text-gray-500 text-xs mt-0.5">{comision.descripcion}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function OrganizacionPage() {
   // Valores de la liga
@@ -243,11 +307,7 @@ export default function OrganizacionPage() {
                   <h3 className="font-bold text-gray-800 mb-2">Junta Directiva</h3>
                   <p className="text-gray-600 text-sm">Órgano de administración</p>
                 </div>
-                <div className="text-center p-6 bg-blue-50 rounded-xl">
-                  <Users className="h-10 w-10 text-blue-600 mx-auto mb-4" />
-                  <h3 className="font-bold text-gray-800 mb-2">Comisiones</h3>
-                  <p className="text-gray-600 text-sm">Áreas especializadas</p>
-                </div>
+                <ComisionesCard />
               </div>
             </CardContent>
           </Card>
