@@ -546,7 +546,7 @@ export default function HomePage() {
                 </div>
 
                 {infoCards.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
                     {infoCards.slice(0, 3).map((card, index) => {
                       // Determinar el icono
                       const IconComponent = 
@@ -632,7 +632,7 @@ export default function HomePage() {
                 </div>
 
                 {events.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
                     {events.slice(0, 3).map((event, index) => {
                       // Alternar colores de gradiente
                       const gradients = [
@@ -645,10 +645,10 @@ export default function HomePage() {
                       return (
                         <div 
                           key={event.id} 
-                          className="group relative bg-white rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2"
+                          className="group relative bg-white rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 flex flex-col h-full"
                         >
                           {/* Content - Text First */}
-                          <div className="p-6">
+                          <div className="p-6 flex-grow">
                             {/* Badge and icon row */}
                             <div className="flex items-center justify-between mb-4">
                               {event.eventType && (
@@ -691,7 +691,7 @@ export default function HomePage() {
                           </div>
                           
                           {/* Event Image - Bottom */}
-                          <div className="relative overflow-hidden bg-gray-100 h-[400px]">
+                          <div className="relative overflow-hidden bg-gray-100 h-[400px] mt-auto">
                             {event.image ? (
                               <>
                                 <img

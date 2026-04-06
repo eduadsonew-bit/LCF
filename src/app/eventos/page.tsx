@@ -181,14 +181,14 @@ export default function EventosPage() {
 
         {/* Loading state with skeleton */}
         {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
             {[...Array(6)].map((_, index) => (
               <EventSkeleton key={index} />
             ))}
           </div>
         ) : filteredEvents.length > 0 ? (
           /* Events grid */
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
             {filteredEvents.map((event, index) => {
               const gradientClass = getGradient(event.eventType, index);
               const badgeColor = getBadgeColor(event.eventType);
@@ -196,12 +196,12 @@ export default function EventosPage() {
               return (
                 <Card 
                   key={event.id} 
-                  className="group relative bg-white rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2"
+                  className="group relative bg-white rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 flex flex-col h-full"
                 >
                   {/* Decorative top bar */}
                   <div className={`h-2 bg-gradient-to-r ${gradientClass}`}></div>
                   
-                  <CardContent className="p-6">
+                  <CardContent className="p-6 flex-grow">
                     {/* Badge and icon row */}
                     <div className="flex items-center justify-between mb-4">
                       {event.eventType && (
@@ -247,7 +247,7 @@ export default function EventosPage() {
                   </CardContent>
                   
                   {/* Event image - Bottom */}
-                  <div className="relative overflow-hidden bg-gray-100 h-[400px]">
+                  <div className="relative overflow-hidden bg-gray-100 h-[400px] mt-auto">
                     {event.image ? (
                       <>
                         <img
