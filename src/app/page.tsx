@@ -445,11 +445,8 @@ export default function HomePage() {
                         }}
                       >
                         {[...sponsors, ...sponsors].map((sponsor, index) => (
-                          <a
+                          <div
                             key={`${sponsor.id}-${index}`}
-                            href={sponsor.website || '#'}
-                            target="_blank"
-                            rel="noopener noreferrer"
                             className="flex-shrink-0 flex items-center justify-center hover:scale-110 transition-transform p-2 px-6"
                           >
                             {sponsor.logo ? (
@@ -467,7 +464,7 @@ export default function HomePage() {
                                 </span>
                               </div>
                             )}
-                          </a>
+                          </div>
                         ))}
                       </div>
                     </div>
