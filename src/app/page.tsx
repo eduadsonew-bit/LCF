@@ -692,13 +692,13 @@ export default function HomePage() {
                           
                           {/* Event Image - Bottom */}
                           {event.image ? (
-                            <div className="relative h-40 overflow-hidden">
+                            <div className="relative overflow-hidden bg-gray-100">
                               <img
                                 src={event.image}
                                 alt={event.title}
-                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                className="w-full h-auto object-contain group-hover:scale-105 transition-transform duration-500"
                               />
-                              <div className={`absolute inset-0 bg-gradient-to-t ${gradientClass} opacity-20`}></div>
+                              <div className={`absolute inset-0 bg-gradient-to-t ${gradientClass} opacity-10 pointer-events-none`}></div>
                             </div>
                           ) : (
                             <div className={`h-4 bg-gradient-to-r ${gradientClass}`}></div>
