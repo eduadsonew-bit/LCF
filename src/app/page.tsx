@@ -692,11 +692,11 @@ export default function HomePage() {
                           
                           {/* Event Image - Bottom */}
                           {event.image ? (
-                            <div className="relative overflow-hidden bg-gray-100">
+                            <div className="relative overflow-hidden bg-gray-100 h-[250px]">
                               <img
                                 src={event.image}
                                 alt={event.title}
-                                className="w-full h-auto object-contain group-hover:scale-105 transition-transform duration-500"
+                                className="w-full h-full object-fill group-hover:scale-105 transition-transform duration-500"
                               />
                               <div className={`absolute inset-0 bg-gradient-to-t ${gradientClass} opacity-10 pointer-events-none`}></div>
                             </div>
