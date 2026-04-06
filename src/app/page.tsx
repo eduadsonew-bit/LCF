@@ -691,18 +691,22 @@ export default function HomePage() {
                           </div>
                           
                           {/* Event Image - Bottom */}
-                          {event.image ? (
-                            <div className="relative overflow-hidden bg-gray-100 h-[400px]">
-                              <img
-                                src={event.image}
-                                alt={event.title}
-                                className="w-full h-full object-fill group-hover:scale-105 transition-transform duration-500"
-                              />
-                              <div className={`absolute inset-0 bg-gradient-to-t ${gradientClass} opacity-10 pointer-events-none`}></div>
-                            </div>
-                          ) : (
-                            <div className={`h-4 bg-gradient-to-r ${gradientClass}`}></div>
-                          )}
+                          <div className="relative overflow-hidden bg-gray-100 h-[400px]">
+                            {event.image ? (
+                              <>
+                                <img
+                                  src={event.image}
+                                  alt={event.title}
+                                  className="w-full h-full object-fill group-hover:scale-105 transition-transform duration-500"
+                                />
+                                <div className={`absolute inset-0 bg-gradient-to-t ${gradientClass} opacity-10 pointer-events-none`}></div>
+                              </>
+                            ) : (
+                              <div className={`w-full h-full bg-gradient-to-br ${gradientClass} flex items-center justify-center`}>
+                                <Calendar className="h-16 w-16 text-white/50" />
+                              </div>
+                            )}
+                          </div>
                           
                           {/* Bottom decorative corner */}
                           <div className={`absolute bottom-0 right-0 w-24 h-24 bg-gradient-to-tl ${gradientClass} opacity-10 rounded-tl-full pointer-events-none`}></div>
