@@ -6,6 +6,7 @@ import {
   Trophy,
   Calendar,
   FileText,
+  Newspaper,
   Users,
   Mail,
   Menu,
@@ -550,57 +551,94 @@ export default function HomePage() {
             </section>
 
             {/* Noticias Recientes Section */}
-            <section className="bg-gradient-to-br from-green-600 to-green-800 py-16 text-white relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/5 before:to-transparent before:pointer-events-none">
-              <div className="container mx-auto px-4">
-                <div className="text-center mb-12">
-                  <h2 className="text-4xl font-bold text-[#fbbf24] mb-3">Noticias Recientes</h2>
-                  <p className="text-green-100 text-lg max-w-2xl mx-auto">Mantente informado sobre las últimas novedades de nuestra liga</p>
-                </div>
+            <section className="container mx-auto px-4 py-12">
+              <div className="text-center mb-8">
+                <h2 className="text-3xl font-bold text-gray-800">Noticias Recientes</h2>
+                <p className="text-gray-500 mt-2">Mantente informado sobre las ultimas novedades de nuestra liga</p>
+              </div>
 
-                {news.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {news.slice(0, 3).map((item) => (
-                      <Card key={item.id} className="group overflow-hidden hover:shadow-xl transition-all duration-300 bg-white text-gray-800 py-0 gap-0 flex flex-col">
-                        <CardContent className="p-5 flex-1">
-                          <h3 className="text-lg font-bold mb-2 line-clamp-2 text-center">{item.title}</h3>
-                          {item.summary && (
-                            <p className="text-sm text-gray-600 mb-2 line-clamp-3 text-center">{item.summary}</p>
+              {news.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
+                  {news.slice(0, 3).map((item, index) => {
+                    const gradients = [
+                      "from-green-400 to-green-600",
+                      "from-amber-400 to-amber-600",
+                      "from-blue-400 to-blue-600",
+                    ];
+                    const gradientClass = gradients[index % gradients.length];
+
+                    return (
+                      <div
+                        key={item.id}
+                        className="group relative bg-white rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 flex flex-col h-full"
+                      >
+                        {/* Decorative top bar */}
+                        <div className={"h-2 bg-gradient-to-r " + gradientClass}></div>
+
+                        <CardContent className="p-6 flex-grow flex flex-col">
+                          {/* Title */}
+                          <h3 className="text-xl font-bold text-center text-gray-800 group-hover:text-green-700 transition-colors">
+                            {item.title}
+                          </h3>
+                          {/* Summary / Content */}
+                          {(item.summary || item.content) && (
+                            <p className="text-sm text-gray-600 mt-3 text-center leading-relaxed line-clamp-4">
+                              {item.summary || item.content.replace(/<[^>]*>/g, "")}
+                            </p>
                           )}
-                          {!item.summary && item.content && (
-                            <p className="text-sm text-gray-600 mb-2 line-clamp-3 text-center">{item.content.replace(/<[^>]*>/g, '').substring(0, 150)}</p>
+                          {/* Author */}
+                          {item.author && (
+                            <div className="text-center mt-3 pt-3 border-t border-gray-100">
+                              <span className="text-xs text-gray-400">{item.author}</span>
+                            </div>
                           )}
                         </CardContent>
-                        {item.image && (
-                          <div className="relative h-40 overflow-hidden">
-                            <img 
-                              src={item.image} 
-                              alt={item.title}
-                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                            />
-                          </div>
-                        )}
-                      </Card>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-12 bg-white/10 rounded-xl">
-                    <FileText className="h-16 w-16 text-green-200 mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold">No hay noticias publicadas</h3>
-                    <p className="text-green-100 mt-2">Pronto publicaremos nuevas novedades</p>
-                  </div>
-                )}
-                {news.length > 0 && (
-                  <div className="text-center mt-8">
-                    <Link 
-                      href="/noticias" 
-                      className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-6 py-3 rounded-full transition-all duration-300 font-medium"
-                    >
-                      Ver todas las noticias
-                      <ArrowRight className="h-4 w-4" />
-                    </Link>
-                  </div>
-                )}
-              </div>
+
+                        {/* News image - Bottom */}
+                        <div
+                          className="relative overflow-hidden bg-gray-100 h-[400px] mt-auto cursor-pointer"
+                          onClick={() => item.image && setSelectedImage({src: item.image, alt: item.title})}
+                        >
+                          {item.image ? (
+                            <>
+                              <img
+                                src={item.image}
+                                alt={item.title}
+                                className="w-full h-full object-fill group-hover:scale-105 transition-transform duration-500"
+                              />
+                              <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/10 pointer-events-none"></div>
+                            </>
+                          ) : (
+                            <div className={"w-full h-full bg-gradient-to-br " + gradientClass + " flex items-center justify-center"}>
+                              <Newspaper className="h-16 w-16 text-white/50" />
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Bottom decorative corner */}
+                        <div className={"absolute bottom-0 right-0 w-24 h-24 bg-gradient-to-tl " + gradientClass + " opacity-10 rounded-tl-full pointer-events-none"}></div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="text-center py-12 bg-white rounded-2xl shadow-lg">
+                  <Newspaper className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+                  <h3 className="text-xl font-semibold text-gray-700">No hay noticias publicadas</h3>
+                  <p className="text-gray-500 mt-2">Pronto publicaremos nuevas novedades</p>
+                </div>
+              )}
+              {news.length > 0 && (
+                <div className="text-center mt-8">
+                  <Link
+                    href="/noticias"
+                    className="inline-flex items-center gap-2 bg-green-700 hover:bg-green-800 text-white px-6 py-3 rounded-full transition-all duration-300 font-medium shadow-lg hover:shadow-xl"
+                  >
+                    Ver todas las noticias
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </div>
+              )}
             </section>
 
             {/* Events Section */}
