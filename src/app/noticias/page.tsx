@@ -1,22 +1,23 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
-  Trophy,
-  Calendar,
-  FileText,
-  ArrowRight,
+  Newspaper,
   ChevronRight,
   Home,
-  Newspaper,
-  User,
   X,
-  ZoomIn,
+  ArrowRight,
+  Calendar,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import SiteLayout from "@/components/SiteLayout";
 
 interface NewsItem {
@@ -31,53 +32,34 @@ interface NewsItem {
   publishedAt: string | null;
 }
 
-interface ImageModal {
-  src: string;
-  alt: string;
-}
-
 // Skeleton component for loading state
-function CardSkeleton() {
-  return (
-    <div className="bg-white rounded-2xl overflow-hidden shadow-lg animate-pulse">
-      <div className="p-5">
-        <div className="h-4 bg-gray-200 rounded w-20 mb-3"></div>
-        <div className="h-6 bg-gray-200 rounded w-3/4 mb-2"></div>
-        <div className="h-4 bg-gray-200 rounded w-full mb-1"></div>
-        <div className="h-4 bg-gray-200 rounded w-2/3 mb-4"></div>
-        <div className="h-3 bg-gray-200 rounded w-24"></div>
+const NewsSkeleton = () => (
+  <Card className="group overflow-hidden hover:shadow-2xl transition-all duration-300 border border-gray-300/60 bg-gradient-to-br from-gray-100 via-gray-200 to-gray-300 text-black relative before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/70 before:via-gray-100/30 before:to-transparent before:rounded-lg before:pointer-events-none after:absolute after:inset-0 after:bg-gradient-to-tl after:from-transparent after:via-transparent after:to-white/40 after:rounded-lg after:pointer-events-none">
+    <div className="h-2 bg-gradient-to-r from-green-400 to-green-600 animate-pulse"></div>
+    <CardContent className="p-6 relative z-10">
+      <div className="flex items-center justify-between mb-4">
+        <div className="h-6 w-20 bg-gray-300 rounded animate-pulse"></div>
+        <div className="w-10 h-10 rounded-xl bg-gray-300 animate-pulse"></div>
       </div>
-      <div className="h-40 bg-gray-200"></div>
-    </div>
-  );
-}
+      <div className="h-6 w-3/4 bg-gray-300 rounded mb-3 animate-pulse"></div>
+      <div className="space-y-2 mb-4">
+        <div className="h-4 w-full bg-gray-300 rounded animate-pulse"></div>
+        <div className="h-4 w-2/3 bg-gray-300 rounded animate-pulse"></div>
+      </div>
+      <div className="space-y-3 pt-4 border-t border-gray-200">
+        <div className="h-8 w-full bg-gray-300 rounded animate-pulse"></div>
+        <div className="h-8 w-full bg-gray-300 rounded animate-pulse"></div>
+      </div>
+    </CardContent>
+  </Card>
+);
 
 export default function NoticiasPage() {
   const [news, setNews] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [visibleCount, setVisibleCount] = useState(9);
-  const [modalImage, setModalImage] = useState<ImageModal | null>(null);
+  const [selectedImage, setSelectedImage] = useState<{src: string, alt: string} | null>(null);
   const ITEMS_PER_PAGE = 6;
-
-  const openImage = useCallback((src: string, alt: string) => {
-    setModalImage({ src, alt });
-    document.body.style.overflow = "hidden";
-  }, []);
-
-  const closeImage = useCallback(() => {
-    setModalImage(null);
-    document.body.style.overflow = "";
-  }, []);
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") closeImage();
-    };
-    if (modalImage) {
-      window.addEventListener("keydown", handleKeyDown);
-    }
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [modalImage, closeImage]);
 
   useEffect(() => {
     const fetchNews = async () => {
@@ -100,183 +82,155 @@ export default function NoticiasPage() {
 
   const visibleNews = news.slice(0, visibleCount);
   const hasMore = visibleCount < news.length;
-  const featuredNews = news.filter((n) => n.featured);
+
+  // Get gradient based on index
+  const getGradient = (index: number) => {
+    const gradients = [
+      "from-green-400 to-green-600",
+      "from-amber-400 to-amber-600",
+      "from-blue-400 to-blue-600",
+      "from-purple-400 to-purple-600",
+      "from-rose-400 to-rose-600",
+    ];
+    return gradients[index % gradients.length];
+  };
+
+  // Render a single news card (same style as Eventos)
+  const renderCard = (item: NewsItem, index: number) => {
+    const gradientClass = getGradient(index);
+
+    return (
+      <Card
+        key={item.id}
+        className="group relative bg-white rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 flex flex-col h-full"
+      >
+        {/* Decorative top bar */}
+        <div className={"h-2 bg-gradient-to-r " + gradientClass}></div>
+
+        <CardContent className="p-6 flex-grow flex items-center justify-center">
+          {/* Content */}
+          <h3 className="text-xl font-bold text-center text-gray-800 group-hover:text-green-700 transition-colors">
+            {item.title}
+          </h3>
+        </CardContent>
+
+        {/* News image - Bottom */}
+        <div
+          className="relative overflow-hidden bg-gray-100 h-[400px] mt-auto cursor-pointer"
+          onClick={() => item.image && setSelectedImage({src: item.image, alt: item.title})}
+        >
+          {item.image ? (
+            <>
+              <img
+                src={item.image}
+                alt={item.title}
+                className="w-full h-full object-fill group-hover:scale-105 transition-transform duration-500"
+              />
+              <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/10 pointer-events-none"></div>
+            </>
+          ) : (
+            <div className={"w-full h-full bg-gradient-to-br " + gradientClass + " flex items-center justify-center"}>
+              <Newspaper className="h-16 w-16 text-white/50" />
+            </div>
+          )}
+        </div>
+
+        {/* Bottom decorative corner */}
+        <div className={"absolute bottom-0 right-0 w-24 h-24 bg-gradient-to-tl " + gradientClass + " opacity-10 rounded-tl-full pointer-events-none"}></div>
+      </Card>
+    );
+  };
 
   return (
     <SiteLayout showNavigation={false}>
-      {/* Hero Header */}
-      <div className="bg-gradient-to-r from-green-700 to-green-900 text-white py-6 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none"></div>
-        <div className="container mx-auto px-4 relative z-10">
+      {/* Header with gradient */}
+      <div className="bg-gradient-to-r from-green-700 to-green-900 py-6 text-white">
+        <div className="container mx-auto px-4">
+          {/* Breadcrumb */}
           <nav className="flex items-center text-sm text-green-200 mb-3">
-            <Link href="/" className="flex items-center hover:text-white transition-colors">
-              <Home className="h-4 w-4 mr-1" />
+            <Link href="/" className="hover:text-white transition-colors">
               Inicio
             </Link>
             <ChevronRight className="h-4 w-4 mx-2" />
             <span className="text-white font-medium">Noticias</span>
           </nav>
+
           <div className="text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-2 text-[#fcd34d]">Noticias</h1>
-            <p className="text-green-200 max-w-2xl mx-auto">
-              Mantente informado sobre las ultimas novedades de la Liga Caldense de Futbol
+            <h1 className="text-4xl font-bold text-[#fcd34d]">Noticias Recientes</h1>
+            <p className="text-green-100 mt-2">Mantente informado sobre las ultimas novedades de la Liga Caldense de Futbol</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="container mx-auto px-4 py-8">
+        {/* Loading state with skeleton */}
+        {loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
+            {[...Array(6)].map((_, index) => (
+              <NewsSkeleton key={index} />
+            ))}
+          </div>
+        ) : news.length > 0 ? (
+          <>
+            {/* News grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
+              {visibleNews.map((item, index) => renderCard(item, index))}
+            </div>
+
+            {/* Load More Button */}
+            {hasMore && (
+              <div className="flex justify-center mt-8">
+                <Button
+                  onClick={handleLoadMore}
+                  size="lg"
+                  className="bg-green-700 hover:bg-green-800 text-white font-semibold px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
+                >
+                  Ver mas noticias
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </div>
+            )}
+
+            {/* News count */}
+            <div className="text-center mt-8 text-gray-500 text-sm">
+              Mostrando {visibleNews.length} de {news.length} noticia{news.length !== 1 ? "s" : ""}
+            </div>
+          </>
+        ) : (
+          /* Empty state */
+          <div className="text-center py-16 bg-white rounded-2xl shadow-lg">
+            <Newspaper className="h-20 w-20 text-gray-300 mx-auto mb-6" />
+            <h3 className="text-2xl font-semibold text-gray-700 mb-2">No hay noticias disponibles</h3>
+            <p className="text-gray-500 max-w-md mx-auto">
+              Pronto publicaremos nuevas novedades. Mantente atento!
             </p>
           </div>
-        </div>
+        )}
       </div>
 
-      {/* Main Content */}
-      <div className="bg-gradient-to-br from-green-600 to-green-800 py-12 text-white relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/5 before:to-transparent before:pointer-events-none">
-        <div className="container mx-auto px-4 relative z-10">
-          {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {[...Array(9)].map((_, index) => (
-                <CardSkeleton key={index} />
-              ))}
-            </div>
-          ) : news.length > 0 ? (
-            <>
-              {/* Featured News Section */}
-              {featuredNews.length > 0 && visibleNews.some((n) => n.featured) && (
-                <div className="mb-12">
-                  <div className="flex items-center gap-3 mb-8">
-                    <Newspaper className="h-6 w-6 text-[#fbbf24]" />
-                    <h2 className="text-2xl font-bold text-[#fbbf24]">Destacadas</h2>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    {visibleNews
-                      .filter((n) => n.featured)
-                      .map((item) => (
-                        <Card key={item.id} className="group overflow-hidden hover:shadow-xl transition-all duration-300 bg-white text-gray-800 py-0 gap-0 flex flex-col">
-                          <CardContent className="p-6 flex-1">
-                            <h3 className="text-xl font-bold mb-3 line-clamp-2 group-hover:text-green-700 transition-colors text-center">
-                              {item.title}
-                            </h3>
-                            {item.summary && (
-                              <p className="text-sm text-gray-600 mb-3 line-clamp-3 text-center">{item.summary}</p>
-                            )}
-                            {!item.summary && item.content && (
-                              <p className="text-sm text-gray-600 mb-3 line-clamp-3 text-center">
-                                {item.content.replace(/<[^>]*>/g, "").substring(0, 150)}
-                              </p>
-                            )}
-                          </CardContent>
-                          {item.image && (
-                            <div
-                              className="relative h-56 overflow-hidden cursor-pointer"
-                              onClick={() => openImage(item.image!, item.title)}
-                            >
-                              <img
-                                src={item.image}
-                                alt={item.title}
-                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                              />
-                              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-300 flex items-center justify-center pointer-events-none">
-                                <ZoomIn className="h-10 w-10 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                              </div>
-                            </div>
-                          )}
-                        </Card>
-                      ))}
-                  </div>
-                </div>
-              )}
-
-              {/* All News Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {visibleNews.map((item) => (
-                  <Card key={item.id} className="group overflow-hidden hover:shadow-xl transition-all duration-300 bg-white text-gray-800 py-0 gap-0 flex flex-col">
-                    <CardContent className="p-5 flex-1">
-                      <h3 className="text-lg font-bold mb-2 line-clamp-2 group-hover:text-green-700 transition-colors text-center">
-                        {item.title}
-                      </h3>
-                      {item.summary && (
-                        <p className="text-sm text-gray-600 mb-2 line-clamp-3 text-center">{item.summary}</p>
-                      )}
-                      {!item.summary && item.content && (
-                        <p className="text-sm text-gray-600 mb-2 line-clamp-3 text-center">
-                          {item.content.replace(/<[^>]*>/g, "").substring(0, 150)}
-                        </p>
-                      )}
-                    </CardContent>
-                    {item.image && (
-                      <div
-                        className="relative h-40 overflow-hidden cursor-pointer"
-                        onClick={() => openImage(item.image!, item.title)}
-                      >
-                        <img
-                          src={item.image}
-                          alt={item.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-300 flex items-center justify-center pointer-events-none">
-                          <ZoomIn className="h-8 w-8 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                        </div>
-                      </div>
-                    )}
-                  </Card>
-                ))}
-              </div>
-
-              {/* Load More Button */}
-              {hasMore && (
-                <div className="flex justify-center mt-12">
-                  <Button
-                    onClick={handleLoadMore}
-                    size="lg"
-                    className="bg-white text-green-700 hover:bg-green-50 font-semibold px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
-                  >
-                    Ver mas noticias
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </Button>
-                </div>
-              )}
-
-              {/* Showing count */}
-              <div className="text-center mt-6 text-green-200 text-sm">
-                Mostrando {visibleNews.length} de {news.length} noticias
-              </div>
-            </>
-          ) : (
-            <div className="text-center py-16 bg-white/10 rounded-2xl">
-              <Newspaper className="h-20 w-20 text-green-200 mx-auto mb-6" />
-              <h3 className="text-2xl font-semibold mb-3">No hay noticias publicadas</h3>
-              <p className="text-green-200 max-w-md mx-auto">
-                Pronto publicaremos nuevas novedades e informacion importante sobre la liga.
-              </p>
+      {/* Image Dialog */}
+      <Dialog open={!!selectedImage} onOpenChange={() => setSelectedImage(null)}>
+        <DialogContent className="max-w-4xl max-h-[90vh] p-0 bg-black/95 border-none">
+          <DialogHeader>
+            <DialogTitle className="sr-only">{selectedImage?.alt || "Imagen ampliada"}</DialogTitle>
+          </DialogHeader>
+          <button
+            onClick={() => setSelectedImage(null)}
+            className="absolute top-4 right-4 z-10 bg-white/10 hover:bg-white/20 text-white rounded-full p-2 transition-colors"
+          >
+            <X className="h-6 w-6" />
+          </button>
+          {selectedImage && (
+            <div className="relative w-full h-full flex items-center justify-center p-4">
+              <img
+                src={selectedImage.src}
+                alt={selectedImage.alt}
+                className="max-w-full max-h-[80vh] object-contain rounded-lg"
+              />
             </div>
           )}
-        </div>
-      </div>
-
-      {/* Image Modal - Manual (no Dialog component) */}
-      {modalImage && (
-        <div
-          className="fixed inset-0 z-[9999] flex items-center justify-center"
-          onClick={closeImage}
-          style={{ backgroundColor: "rgba(0,0,0,0.9)" }}
-        >
-          <button
-            onClick={closeImage}
-            className="absolute top-4 right-4 z-10 bg-white/10 hover:bg-white/20 text-white rounded-full p-3 transition-colors"
-            style={{ cursor: "pointer" }}
-          >
-            <X className="h-7 w-7" />
-          </button>
-          <div
-            onClick={(e) => e.stopPropagation()}
-            className="relative flex items-center justify-center p-4"
-            style={{ maxHeight: "90vh", maxWidth: "90vw" }}
-          >
-            <img
-              src={modalImage.src}
-              alt={modalImage.alt}
-              className="max-w-full rounded-lg"
-              style={{ maxHeight: "85vh", objectFit: "contain" }}
-            />
-          </div>
-        </div>
-      )}
+        </DialogContent>
+      </Dialog>
     </SiteLayout>
   );
 }

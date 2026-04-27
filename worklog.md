@@ -53,3 +53,29 @@ Stage Summary:
 - Public /programacion page auto-detects file type and renders accordingly
 - API route correctly differentiates PDF vs Excel content type
 - Prisma schema already supports any fileType string - no migration needed
+
+---
+Task ID: 2
+Agent: Main Agent
+Task: Reestructurar modulo Noticias para que tenga el mismo comportamiento y card fields que Eventos
+
+Work Log:
+- Leida pagina /src/app/eventos/page.tsx como referencia (cards con barra decorativa, titulo centrado, imagen inferior h-[400px], Dialog lightbox)
+- Leida pagina /src/app/noticias/page.tsx actual (cards con texto, manual modal, diferente estructura)
+- Identificadas diferencias: Eventos usa Dialog de shadcn, tiene barra gradient top, imagen object-fill h-[400px], corner decorativo
+- Reescrita completa de /src/app/noticias/page.tsx con misma estructura de cards que Eventos:
+  - Barra decorativa gradient (h-2) en parte superior de cada card
+  - CardContent con titulo centrado y hover:text-green-700
+  - Imagen en parte inferior (h-[400px], object-fill, cursor-pointer, onClick abre Dialog)
+  - Esquina decorativa inferior con gradiente
+  - Skeleton loading igual a Eventos
+  - Lightbox usando componente Dialog de shadcn/ui (no modal manual)
+  - Mantenidos: load more button, contador de noticias, seccion de contenido principal
+- Build exitoso sin errores
+- Servidor PM2 reiniciado y verificado (HTTP 200 en /noticias)
+
+Stage Summary:
+- Pagina de Noticias reestructurada para tener mismo comportamiento y estilo de cards que Eventos
+- Cards ahora tienen: barra gradient top, titulo centrado, imagen inferior h-[400px], Dialog lightbox
+- Se elimino el modal manual anterior y se uso Dialog de shadcn/ui (misma implementacion que Eventos)
+- Build exitoso, servidor respondiendo correctamente
