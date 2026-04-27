@@ -8,7 +8,6 @@ import {
   Home,
   X,
   ArrowRight,
-  Calendar,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -115,18 +114,12 @@ export default function NoticiasPage() {
               {item.summary || item.content.replace(/<[^>]*>/g, "")}
             </p>
           )}
-          {/* Author & Date */}
-          <div className="flex items-center justify-center gap-4 mt-3 pt-3 border-t border-gray-100">
-            {item.author && (
+          {/* Author */}
+          {item.author && (
+            <div className="text-center mt-3 pt-3 border-t border-gray-100">
               <span className="text-xs text-gray-400">{item.author}</span>
-            )}
-            {item.publishedAt && (
-              <span className="text-xs text-gray-400 flex items-center gap-1">
-                <Calendar className="h-3 w-3" />
-                {new Date(item.publishedAt).toLocaleDateString("es-ES", { day: "numeric", month: "short", year: "numeric" })}
-              </span>
-            )}
-          </div>
+            </div>
+          )}
         </CardContent>
 
         {/* News image - Bottom */}
