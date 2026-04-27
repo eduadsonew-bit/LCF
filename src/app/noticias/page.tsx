@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import {
   Trophy,
@@ -12,16 +12,11 @@ import {
   Newspaper,
   User,
   X,
+  ZoomIn,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import SiteLayout from "@/components/SiteLayout";
 
 interface NewsItem {
@@ -34,6 +29,11 @@ interface NewsItem {
   published: boolean;
   featured: boolean;
   publishedAt: string | null;
+}
+
+interface ImageModal {
+  src: string;
+  alt: string;
 }
 
 // Skeleton component for loading state
@@ -56,33 +56,43 @@ export default function NoticiasPage() {
   const [news, setNews] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [visibleCount, setVisibleCount] = useState(9);
-  const [selectedImage, setSelectedImage] = useState<{src: string, alt: string} | null>(null);
+  const [modalImage, setModalImage] = useState<ImageModal | null>(null);
   const ITEMS_PER_PAGE = 6;
+
+  const openImage = useCallback((src: string, alt: string) => {
+    setModalImage({ src, alt });
+    document.body.style.overflow = "hidden";
+  }, []);
+
+  const closeImage = useCallback(() => {
+    setModalImage(null);
+    document.body.style.overflow = "";
+  }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeImage();
+    };
+    if (modalImage) {
+      window.addEventListener("keydown", handleKeyDown);
+    }
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [modalImage, closeImage]);
 
   useEffect(() => {
     const fetchNews = async () => {
       try {
-        const res = await fetch('/api/public/news');
+        const res = await fetch("/api/public/news");
         const data = await res.json();
         setNews(data);
       } catch (error) {
-        console.error('Error fetching news:', error);
+        console.error("Error fetching news:", error);
       } finally {
         setLoading(false);
       }
     };
-
     fetchNews();
   }, []);
-
-  const formatDate = (dateString: string | null) => {
-    if (!dateString) return null;
-    return new Date(dateString).toLocaleDateString('es-CO', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
-    });
-  };
 
   const handleLoadMore = () => {
     setVisibleCount((prev) => prev + ITEMS_PER_PAGE);
@@ -90,10 +100,7 @@ export default function NoticiasPage() {
 
   const visibleNews = news.slice(0, visibleCount);
   const hasMore = visibleCount < news.length;
-
-  // Featured news and regular news
-  const featuredNews = news.filter(n => n.featured);
-  const regularNews = news.filter(n => !n.featured);
+  const featuredNews = news.filter((n) => n.featured);
 
   return (
     <SiteLayout showNavigation={false}>
@@ -101,7 +108,6 @@ export default function NoticiasPage() {
       <div className="bg-gradient-to-r from-green-700 to-green-900 text-white py-6 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none"></div>
         <div className="container mx-auto px-4 relative z-10">
-          {/* Breadcrumb */}
           <nav className="flex items-center text-sm text-green-200 mb-3">
             <Link href="/" className="flex items-center hover:text-white transition-colors">
               <Home className="h-4 w-4 mr-1" />
@@ -110,8 +116,6 @@ export default function NoticiasPage() {
             <ChevronRight className="h-4 w-4 mx-2" />
             <span className="text-white font-medium">Noticias</span>
           </nav>
-
-          {/* Title */}
           <div className="text-center">
             <h1 className="text-4xl md:text-5xl font-bold mb-2 text-[#fcd34d]">Noticias</h1>
             <p className="text-green-200 max-w-2xl mx-auto">
@@ -133,40 +137,47 @@ export default function NoticiasPage() {
           ) : news.length > 0 ? (
             <>
               {/* Featured News Section */}
-              {featuredNews.length > 0 && visibleNews.some(n => n.featured) && (
+              {featuredNews.length > 0 && visibleNews.some((n) => n.featured) && (
                 <div className="mb-12">
                   <div className="flex items-center gap-3 mb-8">
                     <Newspaper className="h-6 w-6 text-[#fbbf24]" />
                     <h2 className="text-2xl font-bold text-[#fbbf24]">Destacadas</h2>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    {visibleNews.filter(n => n.featured).map((item) => (
-                      <Card key={item.id} className="group overflow-hidden hover:shadow-xl transition-all duration-300 bg-white text-gray-800 py-0 gap-0 flex flex-col">
-                        <CardContent className="p-6 flex-1">
-                          <h3 className="text-xl font-bold mb-3 line-clamp-2 group-hover:text-green-700 transition-colors text-center">
-                            {item.title}
-                          </h3>
-                          {item.summary && (
-                            <p className="text-sm text-gray-600 mb-3 line-clamp-3 text-center">{item.summary}</p>
+                    {visibleNews
+                      .filter((n) => n.featured)
+                      .map((item) => (
+                        <Card key={item.id} className="group overflow-hidden hover:shadow-xl transition-all duration-300 bg-white text-gray-800 py-0 gap-0 flex flex-col">
+                          <CardContent className="p-6 flex-1">
+                            <h3 className="text-xl font-bold mb-3 line-clamp-2 group-hover:text-green-700 transition-colors text-center">
+                              {item.title}
+                            </h3>
+                            {item.summary && (
+                              <p className="text-sm text-gray-600 mb-3 line-clamp-3 text-center">{item.summary}</p>
+                            )}
+                            {!item.summary && item.content && (
+                              <p className="text-sm text-gray-600 mb-3 line-clamp-3 text-center">
+                                {item.content.replace(/<[^>]*>/g, "").substring(0, 150)}
+                              </p>
+                            )}
+                          </CardContent>
+                          {item.image && (
+                            <div
+                              className="relative h-56 overflow-hidden cursor-pointer"
+                              onClick={() => openImage(item.image!, item.title)}
+                            >
+                              <img
+                                src={item.image}
+                                alt={item.title}
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                              />
+                              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-300 flex items-center justify-center pointer-events-none">
+                                <ZoomIn className="h-10 w-10 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                              </div>
+                            </div>
                           )}
-                          {!item.summary && item.content && (
-                            <p className="text-sm text-gray-600 mb-3 line-clamp-3 text-center">{item.content.replace(/<[^>]*>/g, '').substring(0, 150)}</p>
-                          )}
-                        </CardContent>
-                        {item.image && (
-                          <div
-                            className="relative h-56 overflow-hidden cursor-pointer"
-                            onClick={() => setSelectedImage({src: item.image!, alt: item.title})}
-                          >
-                            <img
-                              src={item.image}
-                              alt={item.title}
-                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                            />
-                          </div>
-                        )}
-                      </Card>
-                    ))}
+                        </Card>
+                      ))}
                   </div>
                 </div>
               )}
@@ -183,19 +194,24 @@ export default function NoticiasPage() {
                         <p className="text-sm text-gray-600 mb-2 line-clamp-3 text-center">{item.summary}</p>
                       )}
                       {!item.summary && item.content && (
-                        <p className="text-sm text-gray-600 mb-2 line-clamp-3 text-center">{item.content.replace(/<[^>]*>/g, '').substring(0, 150)}</p>
+                        <p className="text-sm text-gray-600 mb-2 line-clamp-3 text-center">
+                          {item.content.replace(/<[^>]*>/g, "").substring(0, 150)}
+                        </p>
                       )}
                     </CardContent>
                     {item.image && (
                       <div
                         className="relative h-40 overflow-hidden cursor-pointer"
-                        onClick={() => setSelectedImage({src: item.image!, alt: item.title})}
+                        onClick={() => openImage(item.image!, item.title)}
                       >
                         <img
                           src={item.image}
                           alt={item.title}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         />
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-300 flex items-center justify-center pointer-events-none">
+                          <ZoomIn className="h-8 w-8 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                        </div>
                       </div>
                     )}
                   </Card>
@@ -233,29 +249,34 @@ export default function NoticiasPage() {
         </div>
       </div>
 
-      {/* Image Dialog */}
-      <Dialog open={!!selectedImage} onOpenChange={() => setSelectedImage(null)}>
-        <DialogContent className="max-w-4xl max-h-[90vh] p-0 bg-black/95 border-none">
-          <DialogHeader>
-            <DialogTitle className="sr-only">{selectedImage?.alt || 'Imagen ampliada'}</DialogTitle>
-          </DialogHeader>
+      {/* Image Modal - Manual (no Dialog component) */}
+      {modalImage && (
+        <div
+          className="fixed inset-0 z-[9999] flex items-center justify-center"
+          onClick={closeImage}
+          style={{ backgroundColor: "rgba(0,0,0,0.9)" }}
+        >
           <button
-            onClick={() => setSelectedImage(null)}
-            className="absolute top-4 right-4 z-10 bg-white/10 hover:bg-white/20 text-white rounded-full p-2 transition-colors"
+            onClick={closeImage}
+            className="absolute top-4 right-4 z-10 bg-white/10 hover:bg-white/20 text-white rounded-full p-3 transition-colors"
+            style={{ cursor: "pointer" }}
           >
-            <X className="h-6 w-6" />
+            <X className="h-7 w-7" />
           </button>
-          {selectedImage && (
-            <div className="relative w-full h-full flex items-center justify-center p-4">
-              <img
-                src={selectedImage.src}
-                alt={selectedImage.alt}
-                className="max-w-full max-h-[80vh] object-contain rounded-lg"
-              />
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="relative flex items-center justify-center p-4"
+            style={{ maxHeight: "90vh", maxWidth: "90vw" }}
+          >
+            <img
+              src={modalImage.src}
+              alt={modalImage.alt}
+              className="max-w-full rounded-lg"
+              style={{ maxHeight: "85vh", objectFit: "contain" }}
+            />
+          </div>
+        </div>
+      )}
     </SiteLayout>
   );
 }
