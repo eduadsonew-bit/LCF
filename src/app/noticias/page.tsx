@@ -11,10 +11,17 @@ import {
   Home,
   Newspaper,
   User,
+  X,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import SiteLayout from "@/components/SiteLayout";
 
 interface NewsItem {
@@ -49,6 +56,7 @@ export default function NoticiasPage() {
   const [news, setNews] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [visibleCount, setVisibleCount] = useState(9);
+  const [selectedImage, setSelectedImage] = useState<{src: string, alt: string} | null>(null);
   const ITEMS_PER_PAGE = 6;
 
   useEffect(() => {
@@ -107,7 +115,7 @@ export default function NoticiasPage() {
           <div className="text-center">
             <h1 className="text-4xl md:text-5xl font-bold mb-2 text-[#fcd34d]">Noticias</h1>
             <p className="text-green-200 max-w-2xl mx-auto">
-              Mantente informado sobre las últimas novedades de la Liga Caldense de Fútbol
+              Mantente informado sobre las ultimas novedades de la Liga Caldense de Futbol
             </p>
           </div>
         </div>
@@ -146,7 +154,10 @@ export default function NoticiasPage() {
                           )}
                         </CardContent>
                         {item.image && (
-                          <div className="relative h-56 overflow-hidden">
+                          <div
+                            className="relative h-56 overflow-hidden cursor-pointer"
+                            onClick={() => setSelectedImage({src: item.image!, alt: item.title})}
+                          >
                             <img
                               src={item.image}
                               alt={item.title}
@@ -176,7 +187,10 @@ export default function NoticiasPage() {
                       )}
                     </CardContent>
                     {item.image && (
-                      <div className="relative h-40 overflow-hidden">
+                      <div
+                        className="relative h-40 overflow-hidden cursor-pointer"
+                        onClick={() => setSelectedImage({src: item.image!, alt: item.title})}
+                      >
                         <img
                           src={item.image}
                           alt={item.title}
@@ -196,7 +210,7 @@ export default function NoticiasPage() {
                     size="lg"
                     className="bg-white text-green-700 hover:bg-green-50 font-semibold px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
                   >
-                    Ver más noticias
+                    Ver mas noticias
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
                 </div>
@@ -212,12 +226,36 @@ export default function NoticiasPage() {
               <Newspaper className="h-20 w-20 text-green-200 mx-auto mb-6" />
               <h3 className="text-2xl font-semibold mb-3">No hay noticias publicadas</h3>
               <p className="text-green-200 max-w-md mx-auto">
-                Pronto publicaremos nuevas novedades e información importante sobre la liga.
+                Pronto publicaremos nuevas novedades e informacion importante sobre la liga.
               </p>
             </div>
           )}
         </div>
       </div>
+
+      {/* Image Dialog */}
+      <Dialog open={!!selectedImage} onOpenChange={() => setSelectedImage(null)}>
+        <DialogContent className="max-w-4xl max-h-[90vh] p-0 bg-black/95 border-none">
+          <DialogHeader>
+            <DialogTitle className="sr-only">{selectedImage?.alt || 'Imagen ampliada'}</DialogTitle>
+          </DialogHeader>
+          <button
+            onClick={() => setSelectedImage(null)}
+            className="absolute top-4 right-4 z-10 bg-white/10 hover:bg-white/20 text-white rounded-full p-2 transition-colors"
+          >
+            <X className="h-6 w-6" />
+          </button>
+          {selectedImage && (
+            <div className="relative w-full h-full flex items-center justify-center p-4">
+              <img
+                src={selectedImage.src}
+                alt={selectedImage.alt}
+                className="max-w-full max-h-[80vh] object-contain rounded-lg"
+              />
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </SiteLayout>
   );
 }
