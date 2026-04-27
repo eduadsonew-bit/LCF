@@ -1,0 +1,245 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model AdminUser {
+  id        String   @id @default(cuid())
+  name      String
+  pin       String   @unique
+  role      String   @default("admin") // "dev" = full access, "admin" = limited access
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Tournament {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  startDate   DateTime?
+  endDate     DateTime?
+  status      String   @default("active") // active, finished, upcoming
+  category    String?  // infantil, juvenil, adulto, etc.
+  image       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  matches     Match[]
+}
+
+model Match {
+  id            String      @id @default(cuid())
+  tournamentId  String?
+  tournament    Tournament? @relation(fields: [tournamentId], references: [id])
+  homeTeam      String
+  awayTeam      String
+  homeScore     Int?
+  awayScore     Int?
+  matchDate     DateTime?
+  venue         String?
+  status        String      @default("scheduled") // scheduled, live, finished
+  homeTeamLogo  String?
+  awayTeamLogo  String?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+model News {
+  id          String   @id @default(cuid())
+  title       String
+  content     String?
+  summary     String?
+  image       String?
+  author      String?
+  published   Boolean  @default(false)
+  featured    Boolean  @default(false)
+  publishedAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Event {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  date        DateTime?
+  endDate     DateTime?
+  location    String?
+  image       String?
+  eventType   String?  // partido, torneo, ceremonia, etc.
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Sponsor {
+  id        String   @id @default(cuid())
+  name      String
+  logo      String?
+  website   String?
+  tier      String   @default("bronze") // gold, silver, bronze
+  active    Boolean  @default(true)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model CarouselSlide {
+  id        String   @id @default(cuid())
+  title     String
+  subtitle  String?
+  image     String?
+  video     String?
+  link      String?
+  linkText  String?
+  order     Int      @default(0)
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model InfoCard {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  image       String?  // URL de la imagen de la noticia
+  icon        String?  // trophy, calendar, file-text, users, etc.
+  link        String?
+  linkText    String?
+  color       String?  // green, blue, orange, etc.
+  order       Int      @default(0)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model GalleryItem {
+  id          String   @id @default(cuid())
+  title       String?
+  description String?
+  image       String
+  category    String?  // torneo, partido, ceremonia, etc.
+  order       Int      @default(0)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Team {
+  id        String   @id @default(cuid())
+  name      String
+  logo      String?
+  city      String?
+  email     String?
+  category  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ScheduleFile {
+  id          String   @id @default(cuid())
+  name        String
+  fileName    String
+  fileType    String   // "pdf"
+  fileData    String   // Base64 encoded file data
+  description String?
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model LoginAttempt {
+  id           String   @id @default(cuid())
+  ipAddress    String
+  attempts     Int      @default(0)
+  blockedUntil DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  @@unique(ipAddress)
+}
+
+model Resolution {
+  id          String   @id @default(cuid())
+  title       String
+  type        String   // reglamento, resolucion, circular, acta, calendario, sancion, protocolo
+  number      String   // número de documento ej: RG-001-2025
+  description String?
+  fileUrl     String?  // URL del archivo PDF/Excel
+  fileData    String?  // Base64 encoded file data
+  fileName    String?
+  fileType    String?  // pdf, xlsx
+  date        DateTime @default(now())
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model SocialMedia {
+  id        String   @id @default(cuid())
+  platform  String   // facebook, instagram, twitter, youtube, tiktok
+  url       String
+  icon      String?  // nombre del icono
+  active    Boolean  @default(true)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Standing {
+  id           String   @id @default(cuid())
+  teamName     String
+  teamLogo     String?
+  category     String   // primera-a, primera-b, sub-20, sub-17
+  played       Int      @default(0)
+  won          Int      @default(0)
+  drawn        Int      @default(0)
+  lost         Int      @default(0)
+  goalsFor     Int      @default(0)
+  goalsAgainst Int      @default(0)
+  points       Int      @default(0)
+  order        Int      @default(0)
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model TopScorer {
+  id        String   @id @default(cuid())
+  name      String
+  team      String
+  goals     Int      @default(0)
+  assists   Int      @default(0)
+  category  String   // primera-a, primera-b, sub-20, sub-17
+  order     Int      @default(0)
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model StatisticsFile {
+  id          String   @id @default(cuid())
+  name        String
+  fileName    String
+  fileType    String   // "xlsx" or "pdf"
+  fileData    String   // Base64 encoded file data
+  description String?
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model PageDamage {
+  id         String   @id @default(cuid())
+  page       String
+  damageType String
+  message    String
+  active     Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
