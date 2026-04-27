@@ -37,18 +37,15 @@ const NewsSkeleton = () => (
   <Card className="group overflow-hidden hover:shadow-2xl transition-all duration-300 border border-gray-300/60 bg-gradient-to-br from-gray-100 via-gray-200 to-gray-300 text-black relative before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/70 before:via-gray-100/30 before:to-transparent before:rounded-lg before:pointer-events-none after:absolute after:inset-0 after:bg-gradient-to-tl after:from-transparent after:via-transparent after:to-white/40 after:rounded-lg after:pointer-events-none">
     <div className="h-2 bg-gradient-to-r from-green-400 to-green-600 animate-pulse"></div>
     <CardContent className="p-6 relative z-10">
-      <div className="flex items-center justify-between mb-4">
-        <div className="h-6 w-20 bg-gray-300 rounded animate-pulse"></div>
-        <div className="w-10 h-10 rounded-xl bg-gray-300 animate-pulse"></div>
-      </div>
-      <div className="h-6 w-3/4 bg-gray-300 rounded mb-3 animate-pulse"></div>
-      <div className="space-y-2 mb-4">
+      <div className="h-6 w-3/4 mx-auto bg-gray-300 rounded mb-3 animate-pulse"></div>
+      <div className="space-y-2 mb-3">
         <div className="h-4 w-full bg-gray-300 rounded animate-pulse"></div>
+        <div className="h-4 w-5/6 bg-gray-300 rounded animate-pulse"></div>
         <div className="h-4 w-2/3 bg-gray-300 rounded animate-pulse"></div>
       </div>
-      <div className="space-y-3 pt-4 border-t border-gray-200">
-        <div className="h-8 w-full bg-gray-300 rounded animate-pulse"></div>
-        <div className="h-8 w-full bg-gray-300 rounded animate-pulse"></div>
+      <div className="flex items-center justify-center gap-4 pt-3 border-t border-gray-200">
+        <div className="h-3 w-16 bg-gray-300 rounded animate-pulse"></div>
+        <div className="h-3 w-20 bg-gray-300 rounded animate-pulse"></div>
       </div>
     </CardContent>
   </Card>
@@ -107,11 +104,29 @@ export default function NoticiasPage() {
         {/* Decorative top bar */}
         <div className={"h-2 bg-gradient-to-r " + gradientClass}></div>
 
-        <CardContent className="p-6 flex-grow flex items-center justify-center">
-          {/* Content */}
+        <CardContent className="p-6 flex-grow flex flex-col">
+          {/* Title */}
           <h3 className="text-xl font-bold text-center text-gray-800 group-hover:text-green-700 transition-colors">
             {item.title}
           </h3>
+          {/* Summary / Content */}
+          {(item.summary || item.content) && (
+            <p className="text-sm text-gray-600 mt-3 text-center leading-relaxed line-clamp-4">
+              {item.summary || item.content.replace(/<[^>]*>/g, "")}
+            </p>
+          )}
+          {/* Author & Date */}
+          <div className="flex items-center justify-center gap-4 mt-3 pt-3 border-t border-gray-100">
+            {item.author && (
+              <span className="text-xs text-gray-400">{item.author}</span>
+            )}
+            {item.publishedAt && (
+              <span className="text-xs text-gray-400 flex items-center gap-1">
+                <Calendar className="h-3 w-3" />
+                {new Date(item.publishedAt).toLocaleDateString("es-ES", { day: "numeric", month: "short", year: "numeric" })}
+              </span>
+            )}
+          </div>
         </CardContent>
 
         {/* News image - Bottom */}
