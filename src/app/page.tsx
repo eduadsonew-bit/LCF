@@ -551,11 +551,12 @@ export default function HomePage() {
             </section>
 
             {/* Noticias Recientes Section */}
-            <section className="container mx-auto px-4 py-12">
-              <div className="text-center mb-8">
-                <h2 className="text-3xl font-bold text-gray-800">Noticias Recientes</h2>
-                <p className="text-gray-500 mt-2">Mantente informado sobre las ultimas novedades de nuestra liga</p>
-              </div>
+            <section className="bg-gradient-to-br from-green-600 to-green-800 py-16 text-white relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/5 before:to-transparent before:pointer-events-none">
+              <div className="container mx-auto px-4 relative z-10">
+                <div className="text-center mb-12">
+                  <h2 className="text-4xl font-bold text-[#fbbf24] mb-3">Noticias Recientes</h2>
+                  <p className="text-green-100 text-lg max-w-2xl mx-auto">Mantente informado sobre las ultimas novedades de nuestra liga</p>
+                </div>
 
               {news.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
@@ -622,10 +623,10 @@ export default function HomePage() {
                   })}
                 </div>
               ) : (
-                <div className="text-center py-12 bg-white rounded-2xl shadow-lg">
-                  <Newspaper className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold text-gray-700">No hay noticias publicadas</h3>
-                  <p className="text-gray-500 mt-2">Pronto publicaremos nuevas novedades</p>
+                <div className="text-center py-12 bg-white/10 rounded-xl">
+                  <Newspaper className="h-16 w-16 text-green-200 mx-auto mb-4" />
+                  <h3 className="text-xl font-semibold">No hay noticias publicadas</h3>
+                  <p className="text-green-100 mt-2">Pronto publicaremos nuevas novedades</p>
                 </div>
               )}
               {news.length > 0 && (
@@ -639,6 +640,7 @@ export default function HomePage() {
                   </Link>
                 </div>
               )}
+              </div>
             </section>
 
             {/* Events Section */}
