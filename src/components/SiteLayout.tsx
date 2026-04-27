@@ -23,7 +23,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -274,14 +273,18 @@ export default function SiteLayout({ children, showNavigation = true }: SiteLayo
           <div className="flex flex-col sm:flex-row flex-wrap justify-center lg:justify-between gap-8 text-center lg:text-left">
             {/* Liga Caldense de Fútbol */}
             <div className="flex flex-col items-center lg:items-start">
-              <div className="flex items-center gap-3">
+              <button
+                onClick={() => setAdminOpen(true)}
+                className="flex items-center gap-3 hover:opacity-80 transition-opacity cursor-pointer"
+                title="Panel de Administración"
+              >
                 <img 
                   src="https://image2url.com/r2/default/images/1772308448713-bc826408-825f-4bdc-a154-6795cad265de.png" 
                   alt="LCF Logo" 
                   className="w-10 h-10 rounded-lg object-contain"
                 />
                 <span className="text-xl font-bold">Liga Caldense de Fútbol</span>
-              </div>
+              </button>
             </div>
 
             {/* Síguenos */}
@@ -346,12 +349,6 @@ export default function SiteLayout({ children, showNavigation = true }: SiteLayo
           <div className="border-t border-green-700 mt-8 pt-6 text-center text-green-200 text-sm">
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-4">
               <Dialog open={adminOpen} onOpenChange={setAdminOpen}>
-                <DialogTrigger asChild>
-                  <Button variant="ghost" size="sm" className="text-green-200 hover:text-white hover:bg-green-800 gap-2">
-                    <Settings className="h-4 w-4" />
-                    <span className="text-xs">Admin</span>
-                  </Button>
-                </DialogTrigger>
                 <DialogContent className="sm:max-w-sm">
                   <DialogHeader>
                     <DialogTitle>Panel de Administración</DialogTitle>
@@ -376,7 +373,7 @@ export default function SiteLayout({ children, showNavigation = true }: SiteLayo
                 </DialogContent>
               </Dialog>
             </div>
-            <p>© 2024 LCF - Liga Caldense de Fútbol. Todos los derechos reservados.</p>
+            <button onClick={() => setAdminOpen(true)} className="hover:text-white transition-colors cursor-pointer">© 2026 LCF - Liga Caldense de Fútbol. Todos los derechos reservados.</button>
           </div>
         </div>
       </footer>

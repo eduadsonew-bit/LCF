@@ -22,6 +22,8 @@ import {
   Server,
   AlertTriangle,
   Wrench,
+  Upload,
+  FolderOpen,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -181,7 +183,20 @@ interface SocialMediaItem {
   order: number;
 }
 
-type EditableItem = Tournament | Match | NewsItem | Event | Sponsor | CarouselSlide | InfoCard | GalleryItem | Team | SocialMediaItem;
+interface Project {
+  id: string;
+  title: string;
+  slug: string;
+  description: string | null;
+  content: string | null;
+  image: string | null;
+  category: string | null;
+  status: string;
+  order: number;
+  active: boolean;
+}
+
+type EditableItem = Tournament | Match | NewsItem | Event | Sponsor | CarouselSlide | InfoCard | GalleryItem | Team | SocialMediaItem | Project;
 
 const allTabs = [
   { value: "torneos", label: "Torneos", icon: Trophy },
@@ -192,6 +207,7 @@ const allTabs = [
   { value: "carrusel", label: "Carrusel", icon: Layout },
   { value: "infocards", label: "Info Cards", icon: FileText },
   { value: "galeria", label: "Galería", icon: ImageIcon },
+  { value: "proyectos", label: "Proyectos", icon: FolderOpen },
   { value: "organizacion", label: "Organización", icon: Shield },
   { value: "documentos", label: "Documentos", icon: FileText },
   { value: "clubes", label: "Clubes", icon: Users },
@@ -219,6 +235,7 @@ export default function DevAdminPage() {
   const [teams, setTeams] = useState<Team[]>([]);
   const [scheduleFiles, setScheduleFiles] = useState<ScheduleFile[]>([]);
   const [socialMediaItems, setSocialMediaItems] = useState<SocialMediaItem[]>([]);
+  const [projects, setProjects] = useState<any[]>([]);
 
   // Damage states
   const [damages, setDamages] = useState<Array<{id: string; page: string; damageType: string; message: string; active: boolean; createdAt: string}>>([]);
@@ -241,7 +258,7 @@ export default function DevAdminPage() {
   // Fetch data function
   const fetchAllData = async () => {
     try {
-      const [tournamentsRes, matchesRes, newsRes, eventsRes, sponsorsRes, carouselRes, cardsRes, galleryRes, loginAttemptsRes, teamsRes, scheduleFilesRes, socialMediaRes] = await Promise.all([
+      const [tournamentsRes, matchesRes, newsRes, eventsRes, sponsorsRes, carouselRes, cardsRes, galleryRes, loginAttemptsRes, teamsRes, scheduleFilesRes, socialMediaRes, projectsRes] = await Promise.all([
         fetch('/api/public/tournaments'),
         fetch('/api/public/matches'),
         fetch('/api/admin/news'),
@@ -254,6 +271,7 @@ export default function DevAdminPage() {
         fetch('/api/admin/team'),
         fetch('/api/public/schedule-files'),
         fetch('/api/admin/social-media'),
+        fetch('/api/admin/projects'),
       ]);
 
       setTournaments(await tournamentsRes.json());
@@ -268,6 +286,7 @@ export default function DevAdminPage() {
       setTeams(await teamsRes.json());
       setScheduleFiles(await scheduleFilesRes.json());
       setSocialMediaItems(await socialMediaRes.json());
+      setProjects(await projectsRes.json());
     } catch (error) {
       console.error('Error fetching data:', error);
     }
@@ -391,6 +410,7 @@ export default function DevAdminPage() {
       gallery: { order: 0, active: true, image: '' },
       team: { category: 'Adulto' },
       'social-media': { platform: 'facebook', url: '', active: true, order: 0 },
+      proyectos: { status: 'active', order: 0, active: true, image: '', category: '' },
     };
     setAddForm(defaults[type] || {});
     setAddDialogOpen(true);
@@ -441,6 +461,11 @@ export default function DevAdminPage() {
 
       if (selectedType === 'team' && !body.name) {
         alert('El nombre es obligatorio');
+        return;
+      }
+
+      if (selectedType === 'proyectos' && !body.title) {
+        alert('El título es obligatorio');
         return;
       }
 
@@ -1159,7 +1184,19 @@ export default function DevAdminPage() {
             </div>
             <div className="space-y-2">
               <Label>URL de Imagen *</Label>
-              <Input value={form.image as string || ''} onChange={(e) => handleChange('image', e.target.value)} placeholder="https://..." />
+              <div className="flex gap-2">
+                <Input value={form.image as string || ''} onChange={(e) => handleChange('image', e.target.value)} placeholder="https://..." className="flex-1" />
+                <input type="file" accept="image/*" className="w-10" onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    const fd = new FormData();
+                    fd.append('file', file);
+                    fetch('/api/admin/upload', { method: 'POST', body: fd }).then(r => r.json()).then(data => {
+                      if (data.url) handleChange('image', data.url);
+                    });
+                  }
+                }} />
+              </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
@@ -1236,6 +1273,70 @@ export default function DevAdminPage() {
                 <Switch checked={form.active as boolean || false} onCheckedChange={(v) => handleChange('active', v)} />
                 <Label>Activo</Label>
               </div>
+            </div>
+          </>
+        );
+      case 'proyectos':
+        return (
+          <>
+            <div className="space-y-2">
+              <Label>Título *</Label>
+              <Input value={form.title as string || ''} onChange={(e) => handleChange('title', e.target.value)} placeholder="Título del proyecto" />
+            </div>
+            <div className="space-y-2">
+              <Label>Slug</Label>
+              <Input value={form.slug as string || ''} readOnly className="bg-gray-100 text-gray-500" />
+              <p className="text-xs text-gray-400">Se genera automáticamente a partir del título</p>
+            </div>
+            <div className="space-y-2">
+              <Label>Descripción</Label>
+              <Textarea value={form.description as string || ''} onChange={(e) => handleChange('description', e.target.value)} placeholder="Breve descripción" />
+            </div>
+            <div className="space-y-2">
+              <Label>Contenido</Label>
+              <Textarea className="min-h-40" value={form.content as string || ''} onChange={(e) => handleChange('content', e.target.value)} placeholder="Contenido HTML del proyecto" />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Categoría</Label>
+                <Input value={form.category as string || ''} onChange={(e) => handleChange('category', e.target.value)} placeholder="Ej: Infraestructura" />
+              </div>
+              <div className="space-y-2">
+                <Label>Estado</Label>
+                <Select value={form.status as string || 'active'} onValueChange={(v) => handleChange('status', v)}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="active">Activo</SelectItem>
+                    <SelectItem value="upcoming">Próximo</SelectItem>
+                    <SelectItem value="finished">Finalizado</SelectItem>
+                    <SelectItem value="archived">Archivado</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>URL de Imagen</Label>
+              <div className="flex gap-2">
+                <Input value={form.image as string || ''} onChange={(e) => handleChange('image', e.target.value)} placeholder="https://..." className="flex-1" />
+                <input type="file" accept="image/*" className="w-10" onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    const fd = new FormData();
+                    fd.append('file', file);
+                    fetch('/api/admin/upload', { method: 'POST', body: fd }).then(r => r.json()).then(data => {
+                      if (data.url) handleChange('image', data.url);
+                    });
+                  }
+                }} />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Orden</Label>
+              <Input type="number" value={form.order as number || 0} onChange={(e) => handleChange('order', parseInt(e.target.value))} />
+            </div>
+            <div className="flex items-center gap-2" onPointerDown={(e) => e.stopPropagation()}>
+              <Switch checked={form.active as boolean || false} onCheckedChange={(v) => handleChange('active', v)} />
+              <Label>Activo</Label>
             </div>
           </>
         );
@@ -1357,6 +1458,41 @@ export default function DevAdminPage() {
       case 'gallery': {
         const g = item as GalleryItem;
         return getBasicCard(g.title || 'Sin título', g.category || '', g.image, <Badge variant={g.active ? 'default' : 'secondary'}>{g.active ? 'Activo' : 'Inactivo'}</Badge>);
+      }
+      case 'proyectos': {
+        const p = item as Project;
+        return (
+          <Card className="overflow-hidden">
+            {p.image && (
+              <div className="h-32 overflow-hidden">
+                <img src={p.image} alt={p.title} className="w-full h-full object-cover" />
+              </div>
+            )}
+            <CardContent className="p-4">
+              <div className="flex items-start justify-between mb-2">
+                <h3 className="font-bold line-clamp-1">{p.title}</h3>
+                <div className="flex gap-1 ml-2">
+                  {p.category && <Badge variant="outline" className="text-xs">{p.category}</Badge>}
+                  <Badge className={
+                    p.status === 'active' ? 'bg-green-500 text-xs' :
+                    p.status === 'upcoming' ? 'bg-blue-500 text-xs' :
+                    p.status === 'finished' ? 'bg-gray-500 text-xs' :
+                    'bg-amber-500 text-xs'
+                  }>{p.status}</Badge>
+                </div>
+              </div>
+              <p className="text-sm text-gray-500 mb-3 line-clamp-2">{p.description || p.slug}</p>
+              <div className="flex gap-2">
+                <Button size="sm" variant="outline" onClick={() => openEditDialog(item, type)}>
+                  <Edit className="h-4 w-4 mr-1" /> Editar
+                </Button>
+                <Button size="sm" variant="destructive" onClick={() => openDeleteDialog(item, type)}>
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        );
       }
       case 'team': {
         const t = item as Team;
@@ -1637,6 +1773,7 @@ export default function DevAdminPage() {
           <TabsContent value="carrusel">{renderDataList(carouselSlides as EditableItem[], 'carousel')}</TabsContent>
           <TabsContent value="infocards">{renderDataList(infoCards as EditableItem[], 'infocard')}</TabsContent>
           <TabsContent value="galeria">{renderDataList(galleryItems as EditableItem[], 'gallery')}</TabsContent>
+          <TabsContent value="proyectos">{renderDataList(projects as unknown as EditableItem[], 'proyectos')}</TabsContent>
           <TabsContent value="organizacion">
             <Card className="p-6">
               <div className="flex items-center gap-4 mb-4">
