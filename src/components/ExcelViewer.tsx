@@ -128,10 +128,19 @@ export default function ExcelViewer({ fileData, fileName }: ExcelViewerProps) {
         // Keep only the first sheet
         const singleSheet = parsedSheets.length > 0 ? [parsedSheets[0]] : [];
 
-        // Show all columns as-is from the original Excel, process merges only
+        // Remove column A and show from column B onwards, process merges
         const cleanedSheets = singleSheet.map(sheet => {
+          const newData = sheet.data.map(row => row.slice(1));
+          const newWidths = (sheet.columnWidths || []).slice(1);
+          const newCount = (sheet.columnCount || 1) - 1;
+
+          // Adjust merges: shift left by 1, skip merges entirely in col A
+          const newMerges = (sheet.merges || [])
+            .map(m => ({ top: m.top, left: m.left - 1, bottom: m.bottom, right: m.right - 1 }))
+            .filter(m => m.right >= 0);
+
           const skipCells = new Set<string>();
-          for (const m of (sheet.merges || [])) {
+          for (const m of newMerges) {
             for (let r = m.top; r <= m.bottom; r++) {
               for (let c = m.left; c <= m.right; c++) {
                 if (r === m.top && c === m.left) continue;
@@ -141,12 +150,12 @@ export default function ExcelViewer({ fileData, fileName }: ExcelViewerProps) {
           }
 
           // Apply rowSpan/colSpan to master cells
-          for (const m of (sheet.merges || [])) {
+          for (const m of newMerges) {
             const masterIdx = m.top - 1;
             const masterCol = m.left;
-            if (sheet.data[masterIdx] && sheet.data[masterIdx][masterCol]) {
-              sheet.data[masterIdx][masterCol] = {
-                ...sheet.data[masterIdx][masterCol],
+            if (newData[masterIdx] && newData[masterIdx][masterCol]) {
+              newData[masterIdx][masterCol] = {
+                ...newData[masterIdx][masterCol],
                 rowSpan: m.bottom - m.top + 1,
                 colSpan: m.right - m.left + 1,
               };
@@ -158,51 +167,31 @@ export default function ExcelViewer({ fileData, fileName }: ExcelViewerProps) {
             const parts = key.split('-');
             const r = parseInt(parts[0]);
             const c = parseInt(parts[1]);
-            if (sheet.data[r] && sheet.data[r][c]) {
-              sheet.data[r][c] = { ...sheet.data[r][c], isMergedSkip: true };
+            if (newData[r] && newData[r][c]) {
+              newData[r][c] = { ...newData[r][c], isMergedSkip: true };
             }
           }
 
-          // Merge row 1 across all columns and set height equal to row 2
-          if (sheet.data.length >= 2 && sheet.data[0].length >= 2) {
-            const totalCols = sheet.data[0].length;
-            // Find first non-empty cell in row 1
-            let firstContentCol = -1;
-            for (let c = 0; c < totalCols; c++) {
-              if (sheet.data[0][c] && sheet.data[0][c].value !== null && sheet.data[0][c].value !== undefined && String(sheet.data[0][c].value).trim() !== '') {
-                firstContentCol = c;
-                break;
-              }
+          // Merge row 1 across all remaining columns and set height equal to row 2
+          if (newData.length >= 2 && newData[0].length >= 2) {
+            const totalCols = newData[0].length;
+            for (let c = 1; c < totalCols; c++) {
+              newData[0][c] = { ...newData[0][c], isMergedSkip: true };
             }
-            // Merge from column A (index 0) to last column
-            if (firstContentCol >= 0) {
-              for (let c = 0; c < totalCols; c++) {
-                if (c !== 0) {
-                  sheet.data[0][c] = { ...sheet.data[0][c], isMergedSkip: true };
-                }
-              }
-              // Merge content into column A cell (index 0) if not already there
-              if (firstContentCol > 0) {
-                sheet.data[0][0] = {
-                  ...sheet.data[0][firstContentCol],
-                  value: sheet.data[0][firstContentCol].value,
-                  colSpan: totalCols,
-                };
-              } else {
-                sheet.data[0][0] = {
-                  ...sheet.data[0][0],
-                  colSpan: totalCols,
-                };
-              }
-            }
-            // Set row 1 height equal to row 2
+            newData[0][0] = { ...newData[0][0], colSpan: totalCols };
             if (sheet.rowHeights && sheet.rowHeights.length >= 2) {
               const row2Height = sheet.rowHeights[1] || 25;
               sheet.rowHeights[0] = row2Height;
             }
           }
 
-          return sheet;
+          return {
+            ...sheet,
+            data: newData,
+            columnWidths: newWidths,
+            columnCount: newCount,
+            merges: newMerges,
+          };
         });
 
         setSheets(cleanedSheets);
