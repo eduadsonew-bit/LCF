@@ -96,8 +96,6 @@ function getCellStyle(cell: CellData): React.CSSProperties {
 
   s.padding = '4px 6px';
   s.lineHeight = '1.3';
-  s.overflow = 'hidden';
-  s.textOverflow = 'ellipsis';
   s.whiteSpace = 'pre-wrap';
   s.wordWrap = 'break-word';
   s.overflowWrap = 'break-word';
@@ -313,15 +311,20 @@ export default function ExcelViewer({ fileData, fileName }: ExcelViewerProps) {
   const handleNextSheet = () => { if (activeSheet < sheets.length - 1) setActiveSheet(activeSheet + 1); };
 
   // Calculate proportional column widths that fit within the container
-  const totalRawWidth = (currentSheet.columnWidths || []).reduce((sum, w) => sum + Math.max(w, 50), 0) + 42;
+  // First column (original B) needs wider minimum to fit location names like "VELODROMO UNIVERSIDAD DE CALDAS"
+  const FIRST_COL_MIN = 160;
+  const totalRawWidth = (currentSheet.columnWidths || []).reduce((sum, w, i) => {
+    return sum + Math.max(w, i === 0 ? FIRST_COL_MIN : 50);
+  }, 0) + 42;
 
   const colGroup = (
     <colgroup>
       <col style={{ width: '42px', minWidth: '42px', maxWidth: '42px' }} />
       {currentSheet.data[0]?.map((_, i) => {
-        const raw = Math.max(currentSheet.columnWidths?.[i] || 100, 50);
+        const minW = i === 0 ? FIRST_COL_MIN : 50;
+        const raw = Math.max(currentSheet.columnWidths?.[i] || 100, minW);
         const pct = (raw / totalRawWidth * 100).toFixed(2);
-        return <col key={i} style={{ width: `${pct}%` }} />;
+        return <col key={i} style={{ width: `${pct}%`, minWidth: `${minW}px` }} />;
       })}
     </colgroup>
   );
