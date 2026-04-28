@@ -186,7 +186,7 @@ export default function ExcelViewer({ fileData, fileName }: ExcelViewerProps) {
           }
 
           // Merge specified rows across all columns with height equal to row 2
-          const mergeRows = [6, 9, 14, 19, 23, 26, 33, 35, 38, 45, 50, 57, 60, 66, 72, 78, 84, 91, 98, 103, 108, 113, 130, 133, 139, 147];
+          const mergeRows = [6, 9, 14, 19, 23, 26, 33, 35, 38, 45, 50, 57, 60, 66, 72, 78, 84, 91, 98, 103, 108, 113, 118, 130, 133, 139, 147];
           if (sheet.rowHeights && sheet.rowHeights.length >= 2) {
             const row2Height = sheet.rowHeights[1] || 25;
             for (const rowIdx of mergeRows) {
