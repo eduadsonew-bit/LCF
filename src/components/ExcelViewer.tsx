@@ -185,6 +185,19 @@ export default function ExcelViewer({ fileData, fileName }: ExcelViewerProps) {
             }
           }
 
+          // Merge row 7 across all remaining columns and set height equal to row 2
+          if (newData.length >= 8 && newData[6].length >= 2) {
+            const totalCols = newData[6].length;
+            for (let c = 1; c < totalCols; c++) {
+              newData[6][c] = { ...newData[6][c], isMergedSkip: true };
+            }
+            newData[6][0] = { ...newData[6][0], colSpan: totalCols };
+            if (sheet.rowHeights && sheet.rowHeights.length >= 2) {
+              const row2Height = sheet.rowHeights[1] || 25;
+              sheet.rowHeights[6] = row2Height;
+            }
+          }
+
           return {
             ...sheet,
             data: newData,
