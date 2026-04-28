@@ -150,7 +150,6 @@ export default function ProgramacionPage() {
     if (isExcel) {
       return (
         <div className="space-y-4">
-          <h2 className="text-2xl font-bold text-center text-gray-800">LUIS FERNANDO MONTOYA</h2>
           <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center gap-3">
             <FileSpreadsheet className="h-8 w-8 text-green-600" />
             <div>
