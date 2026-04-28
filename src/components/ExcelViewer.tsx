@@ -185,16 +185,19 @@ export default function ExcelViewer({ fileData, fileName }: ExcelViewerProps) {
             }
           }
 
-          // Merge row 7 across all remaining columns and set height equal to row 2
-          if (newData.length >= 8 && newData[6].length >= 2) {
-            const totalCols = newData[6].length;
-            for (let c = 1; c < totalCols; c++) {
-              newData[6][c] = { ...newData[6][c], isMergedSkip: true };
-            }
-            newData[6][0] = { ...newData[6][0], colSpan: totalCols };
-            if (sheet.rowHeights && sheet.rowHeights.length >= 2) {
-              const row2Height = sheet.rowHeights[1] || 25;
-              sheet.rowHeights[6] = row2Height;
+          // Merge specified rows across all columns with height equal to row 2
+          const mergeRows = [6, 9, 14, 19, 23, 26, 33, 35, 38, 45, 50, 57, 60, 66, 72, 78, 84, 91, 98, 103, 108, 113, 130, 133, 139, 147];
+          if (sheet.rowHeights && sheet.rowHeights.length >= 2) {
+            const row2Height = sheet.rowHeights[1] || 25;
+            for (const rowIdx of mergeRows) {
+              if (newData.length > rowIdx && newData[rowIdx].length >= 2) {
+                const totalCols = newData[rowIdx].length;
+                for (let c = 1; c < totalCols; c++) {
+                  newData[rowIdx][c] = { ...newData[rowIdx][c], isMergedSkip: true };
+                }
+                newData[rowIdx][0] = { ...newData[rowIdx][0], colSpan: totalCols };
+                sheet.rowHeights[rowIdx] = row2Height;
+              }
             }
           }
 
