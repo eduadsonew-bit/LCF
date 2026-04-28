@@ -128,79 +128,10 @@ export default function ExcelViewer({ fileData, fileName }: ExcelViewerProps) {
         // Keep only the first sheet
         const singleSheet = parsedSheets.length > 0 ? [parsedSheets[0]] : [];
 
-        // Remove first column (column A) if it's empty or only has dates
+        // Show all columns as-is from the original Excel, process merges only
         const cleanedSheets = singleSheet.map(sheet => {
-          const colAHasData = sheet.data.some(row => row[0] && row[0].value !== null && row[0].value !== undefined && String(row[0].value).trim() !== '');
-
-          if (!colAHasData) {
-            // Remove column A - shift everything left
-            const newData = sheet.data.map(row => row.slice(1));
-            const newWidths = (sheet.columnWidths || []).slice(1);
-            const newCount = (sheet.columnCount || 1) - 1;
-
-            // Adjust merges: shift left by 1, skip merges entirely in col A
-            const newMerges = (sheet.merges || [])
-              .map(m => ({ top: m.top, left: m.left - 1, bottom: m.bottom, right: m.right - 1 }))
-              .filter(m => m.right >= 0);
-
-            // Re-process merges with new coordinates
-            const skipCells = new Set<string>();
-            const newMergeMap: Record<string, { rowSpan: number; colSpan: number }> = {};
-            for (const m of newMerges) {
-              const masterKey = (m.top - 1) + '-' + m.left;
-              newMergeMap[masterKey] = {
-                rowSpan: m.bottom - m.top + 1,
-                colSpan: m.right - m.left + 1,
-              };
-              for (let r = m.top; r <= m.bottom; r++) {
-                for (let c = m.left; c <= m.right; c++) {
-                  if (r === m.top && c === m.left) continue;
-                  skipCells.add((r - 1) + '-' + c);
-                }
-              }
-            }
-
-            // Apply merge flags to data
-            for (const m of newMerges) {
-              const masterIdx = m.top - 1;
-              const masterCol = m.left;
-              if (newData[masterIdx] && newData[masterIdx][masterCol]) {
-                newData[masterIdx][masterCol] = {
-                  ...newData[masterIdx][masterCol],
-                  rowSpan: m.bottom - m.top + 1,
-                  colSpan: m.right - m.left + 1,
-                };
-              }
-            }
-
-            // Mark skip cells
-            for (const key of skipCells) {
-              const parts = key.split('-');
-              const r = parseInt(parts[0]);
-              const c = parseInt(parts[1]);
-              if (newData[r] && newData[r][c]) {
-                newData[r][c] = { ...newData[r][c], isMergedSkip: true };
-              }
-            }
-
-            return {
-              ...sheet,
-              data: newData,
-              columnWidths: newWidths,
-              columnCount: newCount,
-              merges: newMerges,
-            };
-          }
-
-          // Column A has data - keep it as is, just process merges
           const skipCells = new Set<string>();
-          const mergeMap: Record<string, { rowSpan: number; colSpan: number }> = {};
           for (const m of (sheet.merges || [])) {
-            const masterKey = (m.top - 1) + '-' + m.left;
-            mergeMap[masterKey] = {
-              rowSpan: m.bottom - m.top + 1,
-              colSpan: m.right - m.left + 1,
-            };
             for (let r = m.top; r <= m.bottom; r++) {
               for (let c = m.left; c <= m.right; c++) {
                 if (r === m.top && c === m.left) continue;
@@ -209,6 +140,7 @@ export default function ExcelViewer({ fileData, fileName }: ExcelViewerProps) {
             }
           }
 
+          // Apply rowSpan/colSpan to master cells
           for (const m of (sheet.merges || [])) {
             const masterIdx = m.top - 1;
             const masterCol = m.left;
@@ -221,6 +153,7 @@ export default function ExcelViewer({ fileData, fileName }: ExcelViewerProps) {
             }
           }
 
+          // Mark merged skip cells
           for (const key of skipCells) {
             const parts = key.split('-');
             const r = parseInt(parts[0]);
