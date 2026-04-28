@@ -163,6 +163,45 @@ export default function ExcelViewer({ fileData, fileName }: ExcelViewerProps) {
             }
           }
 
+          // Merge row 1 across all columns and set height equal to row 2
+          if (sheet.data.length >= 2 && sheet.data[0].length >= 2) {
+            const totalCols = sheet.data[0].length;
+            // Find first non-empty cell in row 1
+            let firstContentCol = -1;
+            for (let c = 0; c < totalCols; c++) {
+              if (sheet.data[0][c] && sheet.data[0][c].value !== null && sheet.data[0][c].value !== undefined && String(sheet.data[0][c].value).trim() !== '') {
+                firstContentCol = c;
+                break;
+              }
+            }
+            // Merge from column A (index 0) to last column
+            if (firstContentCol >= 0) {
+              for (let c = 0; c < totalCols; c++) {
+                if (c !== 0) {
+                  sheet.data[0][c] = { ...sheet.data[0][c], isMergedSkip: true };
+                }
+              }
+              // Merge content into column A cell (index 0) if not already there
+              if (firstContentCol > 0) {
+                sheet.data[0][0] = {
+                  ...sheet.data[0][firstContentCol],
+                  value: sheet.data[0][firstContentCol].value,
+                  colSpan: totalCols,
+                };
+              } else {
+                sheet.data[0][0] = {
+                  ...sheet.data[0][0],
+                  colSpan: totalCols,
+                };
+              }
+            }
+            // Set row 1 height equal to row 2
+            if (sheet.rowHeights && sheet.rowHeights.length >= 2) {
+              const row2Height = sheet.rowHeights[1] || 25;
+              sheet.rowHeights[0] = row2Height;
+            }
+          }
+
           return sheet;
         });
 
