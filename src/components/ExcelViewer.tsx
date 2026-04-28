@@ -69,7 +69,7 @@ function getCellStyle(cell: CellData): React.CSSProperties {
     if (cell.style.font.bold) s.fontWeight = 'bold';
     if (cell.style.font.italic) s.fontStyle = 'italic';
     if (cell.style.font.underline) s.textDecoration = 'underline';
-    if (cell.style.font.size) s.fontSize = `${cell.style.font.size}pt`;
+    if (cell.style.font.size) s.fontSize = (cell.style.font.size * 0.75) + 'pt';
     if (cell.style.font.name) s.fontFamily = cell.style.font.name;
   }
 
@@ -82,7 +82,7 @@ function getCellStyle(cell: CellData): React.CSSProperties {
       s.overflowWrap = 'break-word';
     }
     if (cell.style.alignment.indent) {
-      s.paddingLeft = `${(cell.style.alignment.indent || 0) * 8}px`;
+      s.paddingLeft = (cell.style.alignment.indent * 8) + 'px';
     }
   }
 
@@ -128,145 +128,110 @@ export default function ExcelViewer({ fileData, fileName }: ExcelViewerProps) {
         // Keep only the first sheet
         const singleSheet = parsedSheets.length > 0 ? [parsedSheets[0]] : [];
 
-        // Remove first column (column A) from all sheets, shift everything left
+        // Remove first column (column A) if it's empty or only has dates
         const cleanedSheets = singleSheet.map(sheet => {
-          const newData = sheet.data.map(row => row.slice(1));
-          const newWidths = (sheet.columnWidths || []).slice(1);
-          const newCount = (sheet.columnCount || 1) - 1;
+          const colAHasData = sheet.data.some(row => row[0] && row[0].value !== null && row[0].value !== undefined && String(row[0].value).trim() !== '');
 
-          // Adjust merges: shift left by 1, skip merges entirely in col A
-          const newMerges = (sheet.merges || [])
-            .map(m => ({ top: m.top, left: m.left - 1, bottom: m.bottom, right: m.right - 1 }))
-            .filter(m => m.right >= 0);
+          if (!colAHasData) {
+            // Remove column A - shift everything left
+            const newData = sheet.data.map(row => row.slice(1));
+            const newWidths = (sheet.columnWidths || []).slice(1);
+            const newCount = (sheet.columnCount || 1) - 1;
 
-          // Re-process merges with new coordinates for isMergedSkip
+            // Adjust merges: shift left by 1, skip merges entirely in col A
+            const newMerges = (sheet.merges || [])
+              .map(m => ({ top: m.top, left: m.left - 1, bottom: m.bottom, right: m.right - 1 }))
+              .filter(m => m.right >= 0);
+
+            // Re-process merges with new coordinates
+            const skipCells = new Set<string>();
+            const newMergeMap: Record<string, { rowSpan: number; colSpan: number }> = {};
+            for (const m of newMerges) {
+              const masterKey = (m.top - 1) + '-' + m.left;
+              newMergeMap[masterKey] = {
+                rowSpan: m.bottom - m.top + 1,
+                colSpan: m.right - m.left + 1,
+              };
+              for (let r = m.top; r <= m.bottom; r++) {
+                for (let c = m.left; c <= m.right; c++) {
+                  if (r === m.top && c === m.left) continue;
+                  skipCells.add((r - 1) + '-' + c);
+                }
+              }
+            }
+
+            // Apply merge flags to data
+            for (const m of newMerges) {
+              const masterIdx = m.top - 1;
+              const masterCol = m.left;
+              if (newData[masterIdx] && newData[masterIdx][masterCol]) {
+                newData[masterIdx][masterCol] = {
+                  ...newData[masterIdx][masterCol],
+                  rowSpan: m.bottom - m.top + 1,
+                  colSpan: m.right - m.left + 1,
+                };
+              }
+            }
+
+            // Mark skip cells
+            for (const key of skipCells) {
+              const parts = key.split('-');
+              const r = parseInt(parts[0]);
+              const c = parseInt(parts[1]);
+              if (newData[r] && newData[r][c]) {
+                newData[r][c] = { ...newData[r][c], isMergedSkip: true };
+              }
+            }
+
+            return {
+              ...sheet,
+              data: newData,
+              columnWidths: newWidths,
+              columnCount: newCount,
+              merges: newMerges,
+            };
+          }
+
+          // Column A has data - keep it as is, just process merges
           const skipCells = new Set<string>();
-          const newMergeMap: Record<string, { rowSpan: number; colSpan: number }> = {};
-          for (const m of newMerges) {
-            const masterKey = `${m.top - 1}-${m.left}`;
-            newMergeMap[masterKey] = {
+          const mergeMap: Record<string, { rowSpan: number; colSpan: number }> = {};
+          for (const m of (sheet.merges || [])) {
+            const masterKey = (m.top - 1) + '-' + m.left;
+            mergeMap[masterKey] = {
               rowSpan: m.bottom - m.top + 1,
               colSpan: m.right - m.left + 1,
             };
             for (let r = m.top; r <= m.bottom; r++) {
               for (let c = m.left; c <= m.right; c++) {
                 if (r === m.top && c === m.left) continue;
-                skipCells.add(`${r - 1}-${c}`);
+                skipCells.add((r - 1) + '-' + c);
               }
             }
           }
 
-          // Apply merge flags to data
-          for (const m of newMerges) {
+          for (const m of (sheet.merges || [])) {
             const masterIdx = m.top - 1;
             const masterCol = m.left;
-            if (newData[masterIdx] && newData[masterIdx][masterCol]) {
-              newData[masterIdx][masterCol] = {
-                ...newData[masterIdx][masterCol],
+            if (sheet.data[masterIdx] && sheet.data[masterIdx][masterCol]) {
+              sheet.data[masterIdx][masterCol] = {
+                ...sheet.data[masterIdx][masterCol],
                 rowSpan: m.bottom - m.top + 1,
                 colSpan: m.right - m.left + 1,
               };
             }
           }
 
-          // Mark skip cells
           for (const key of skipCells) {
-            const [rStr, cStr] = key.split('-');
-            const r = parseInt(rStr);
-            const c = parseInt(cStr);
-            if (newData[r] && newData[r][c]) {
-              newData[r][c] = { ...newData[r][c], isMergedSkip: true };
+            const parts = key.split('-');
+            const r = parseInt(parts[0]);
+            const c = parseInt(parts[1]);
+            if (sheet.data[r] && sheet.data[r][c]) {
+              sheet.data[r][c] = { ...sheet.data[r][c], isMergedSkip: true };
             }
           }
 
-          return {
-            ...sheet,
-            data: newData,
-            columnWidths: newWidths,
-            columnCount: newCount,
-            merges: newMerges,
-          };
+          return sheet;
         });
-
-        // Custom merge: row 1 (index 0) - combine cols B-F (now indices 0-4), keep col B content, centered
-        for (const sheet of cleanedSheets) {
-          if (sheet.data[0] && sheet.data[0].length >= 5) {
-            for (let c = 1; c <= 4; c++) {
-              sheet.data[0][c] = { ...sheet.data[0][c], isMergedSkip: true };
-            }
-            sheet.data[0][0] = {
-              ...sheet.data[0][0],
-              colSpan: 5,
-              style: {
-                ...sheet.data[0][0].style,
-                font: sheet.data[0][0].style?.font,
-                fill: sheet.data[0][0].style?.fill,
-                border: sheet.data[0][0].style?.border,
-                alignment: {
-                  horizontal: 'center' as const,
-                  vertical: 'middle' as const,
-                  wrapText: true,
-                },
-              },
-            };
-          }
-        }
-
-        // Custom merge: row 5 (index 4) - combine cols B-F (now indices 0-4)
-        for (const sheet of cleanedSheets) {
-          if (sheet.data[4] && sheet.data[4].length >= 5) {
-            for (let c = 1; c <= 4; c++) {
-              sheet.data[4][c] = { ...sheet.data[4][c], isMergedSkip: true };
-            }
-            sheet.data[4][0] = {
-              ...sheet.data[4][0],
-              colSpan: 5,
-            };
-          }
-        }
-
-        // Custom merge: centered rows - combine cols, keep col A content, centered
-        const mergeCenteredRows = [1, 6, 8, 9, 12, 16, 23, 27, 32, 44, 50, 56, 60, 64, 67, 75, 83, 90, 91, 101, 107, 118, 124, 150, 155, 159, 166, 170, 175, 180, 183, 186];
-        const row5HeightRows = [0, 4, 8, 90, 183];
-        for (const sheet of cleanedSheets) {
-          for (const rowIdx of mergeCenteredRows) {
-            if (sheet.data[rowIdx] && sheet.data[rowIdx].length >= 5) {
-              for (let c = 1; c <= 4; c++) {
-                sheet.data[rowIdx][c] = { ...sheet.data[rowIdx][c], isMergedSkip: true };
-              }
-              sheet.data[rowIdx][0] = {
-                ...sheet.data[rowIdx][0],
-                colSpan: 5,
-                style: {
-                  ...sheet.data[rowIdx][0].style,
-                  alignment: {
-                    ...sheet.data[rowIdx][0].style?.alignment,
-                    horizontal: 'center' as const,
-                    vertical: 'middle' as const,
-                  },
-                },
-              };
-            }
-          }
-          // Apply row 5 height to specific rows
-          if (sheet.rowHeights && sheet.rowHeights.length >= 5 && sheet.rowHeights[4]) {
-            for (const rowIdx of row5HeightRows) {
-              if (rowIdx < sheet.rowHeights.length) {
-                sheet.rowHeights[rowIdx] = sheet.rowHeights[4];
-              }
-            }
-          // Normalize oversized rows 33, 34, 35 to height of row 36
-            const normalHeightRows = [33, 34, 35];
-            if (sheet.rowHeights.length > 36) {
-              const refHeight = sheet.rowHeights[36] || 25;
-              for (const rowIdx of normalHeightRows) {
-                if (rowIdx < sheet.rowHeights.length) {
-                  sheet.rowHeights[rowIdx] = refHeight;
-                }
-              }
-            }
-          }
-        }
 
         setSheets(cleanedSheets);
       } catch (err) {
@@ -311,20 +276,15 @@ export default function ExcelViewer({ fileData, fileName }: ExcelViewerProps) {
   const handleNextSheet = () => { if (activeSheet < sheets.length - 1) setActiveSheet(activeSheet + 1); };
 
   // Calculate proportional column widths that fit within the container
-  // First column (original B) needs wider minimum to fit location names like "VELODROMO UNIVERSIDAD DE CALDAS"
-  const FIRST_COL_MIN = 160;
-  const totalRawWidth = (currentSheet.columnWidths || []).reduce((sum, w, i) => {
-    return sum + Math.max(w, i === 0 ? FIRST_COL_MIN : 50);
-  }, 0) + 42;
+  const totalRawWidth = (currentSheet.columnWidths || []).reduce((sum, w) => sum + Math.max(w, 50), 0) + 42;
 
   const colGroup = (
     <colgroup>
       <col style={{ width: '42px', minWidth: '42px', maxWidth: '42px' }} />
       {currentSheet.data[0]?.map((_, i) => {
-        const minW = i === 0 ? FIRST_COL_MIN : 50;
-        const raw = Math.max(currentSheet.columnWidths?.[i] || 100, minW);
+        const raw = Math.max(currentSheet.columnWidths?.[i] || 100, 50);
         const pct = (raw / totalRawWidth * 100).toFixed(2);
-        return <col key={i} style={{ width: `${pct}%`, minWidth: `${minW}px` }} />;
+        return <col key={i} style={{ width: pct + '%' }} />;
       })}
     </colgroup>
   );
@@ -366,11 +326,11 @@ export default function ExcelViewer({ fileData, fileName }: ExcelViewerProps) {
             <button
               key={index}
               onClick={() => setActiveSheet(index)}
-              className={`px-4 h-8 text-xs font-medium whitespace-nowrap transition-colors border-b-2 shrink-0 ${
+              className={"px-4 h-8 text-xs font-medium whitespace-nowrap transition-colors border-b-2 shrink-0 " + (
                 index === activeSheet
                   ? 'bg-white text-green-700 border-green-600'
                   : 'text-gray-600 border-transparent hover:bg-gray-100'
-              }`}
+              )}
             >
               {sheet.name}
             </button>
@@ -398,9 +358,9 @@ export default function ExcelViewer({ fileData, fileName }: ExcelViewerProps) {
               {currentSheet.data[0]?.map((_, colIndex) => (
                 <th
                   key={colIndex}
-                  className={`border-b border-r border-gray-300 text-center text-[11px] font-medium select-none p-0 ${
+                  className={"border-b border-r border-gray-300 text-center text-[11px] font-medium select-none p-0 " + (
                     hoveredCell?.col === colIndex ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
-                  }`}
+                  )}
                   style={{ height: '22px' }}
                 >
                   {getColumnLetter(colIndex)}
@@ -412,11 +372,11 @@ export default function ExcelViewer({ fileData, fileName }: ExcelViewerProps) {
             {currentSheet.data.map((row, rowIndex) => {
               const rowHeight = currentSheet.rowHeights?.[rowIndex] || 0;
               return (
-                <tr key={rowIndex} style={rowHeight > 0 ? { height: `${rowHeight}px` } : undefined}>
+                <tr key={rowIndex} style={rowHeight > 0 ? { height: rowHeight + 'px' } : undefined}>
                   <td
-                    className={`sticky left-0 z-10 border-b border-r border-gray-300 text-center text-[11px] font-medium select-none p-0 ${
+                    className={"sticky left-0 z-10 border-b border-r border-gray-300 text-center text-[11px] font-medium select-none p-0 " + (
                       hoveredCell?.row === rowIndex ? 'bg-green-100 text-green-700' : 'bg-gray-50 text-gray-400'
-                    }`}
+                    )}
                     style={{ width: '42px', minWidth: '42px' }}
                   >
                     {rowIndex + 1}
