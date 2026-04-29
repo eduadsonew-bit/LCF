@@ -374,6 +374,11 @@ export default function ExcelViewer({ fileData, fileName }: ExcelViewerProps) {
                       style.borderBottom = '1px solid #e0e0e0';
                     }
 
+                    // Add left border line on first column
+                    if (colIndex === 0) {
+                      style.borderLeft = '1px solid #e0e0e0';
+                    }
+
                     if (isHighlighted) {
                       style.outline = '2px solid #4caf50';
                       style.outlineOffset = '-1px';
