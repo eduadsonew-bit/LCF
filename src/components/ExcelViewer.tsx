@@ -372,11 +372,14 @@ export default function ExcelViewer({ fileData, fileName }: ExcelViewerProps) {
                     if (!cell.style?.border) {
                       style.borderRight = '1px solid #e0e0e0';
                       style.borderBottom = '1px solid #e0e0e0';
-                    }
-
-                    // Add left border line on first column
-                    if (colIndex === 0) {
-                      style.borderLeft = '1px solid #e0e0e0';
+                      if (colIndex === 0) {
+                        style.borderLeft = '1px solid #a0a0a0';
+                      }
+                    } else {
+                      // Ensure first column always has a visible left border
+                      if (colIndex === 0 && !cell.style.border?.left) {
+                        style.borderLeft = '1px solid #a0a0a0';
+                      }
                     }
 
                     if (isHighlighted) {
