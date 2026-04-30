@@ -172,21 +172,39 @@ export default function ExcelViewer({ fileData, fileName }: ExcelViewerProps) {
             }
           }
 
-          // Merge row 1 across all remaining columns and set height equal to row 2
-          if (newData.length >= 2 && newData[0].length >= 2) {
+          // Insert new row above row 1 with green background and "Sábado 25 de Abril"
+          if (newData.length >= 1 && newData[0].length >= 1) {
             const totalCols = newData[0].length;
+            const headerRow: CellData[] = Array.from({ length: totalCols }, (_, i) => ({
+              value: i === 0 ? 'Sábado 25 de Abril' : null,
+              style: {
+                fill: '#2e7d32',
+                font: { color: '#ffffff', bold: true, size: 14, name: 'Arial' },
+                alignment: { horizontal: 'center' as const, vertical: 'middle' as const },
+              },
+              isMergedSkip: i > 0,
+              colSpan: i === 0 ? totalCols : undefined,
+            }));
+            newData.unshift(headerRow);
+            // Shift row heights down by 1
+            if (sheet.rowHeights) {
+              const row2Height = sheet.rowHeights[1] || sheet.rowHeights[0] || 25;
+              sheet.rowHeights.unshift(row2Height);
+            }
+            sheet.rowCount = (sheet.rowCount || 0) + 1;
+          }
+
+          // Merge row 2 (original row 1) across all remaining columns and set height equal to row 3
+          if (newData.length >= 3 && newData[1].length >= 2) {
+            const totalCols = newData[1].length;
             for (let c = 1; c < totalCols; c++) {
-              newData[0][c] = { ...newData[0][c], isMergedSkip: true };
+              newData[1][c] = { ...newData[1][c], isMergedSkip: true };
             }
-            newData[0][0] = { ...newData[0][0], colSpan: totalCols };
-            if (sheet.rowHeights && sheet.rowHeights.length >= 2) {
-              const row2Height = sheet.rowHeights[1] || 25;
-              sheet.rowHeights[0] = row2Height;
-            }
+            newData[1][0] = { ...newData[1][0], colSpan: totalCols };
           }
 
           // Merge specified rows across all columns with height equal to row 2
-          const mergeRows = [6, 9, 14, 19, 23, 26, 33, 35, 38, 45, 50, 57, 60, 66, 72, 78, 84, 91, 98, 103, 108, 113, 118, 130, 133, 139, 147];
+          const mergeRows = [7, 10, 15, 20, 24, 27, 34, 36, 39, 46, 51, 58, 61, 67, 73, 79, 85, 92, 99, 104, 109, 114, 119, 131, 134, 140, 148];
           if (sheet.rowHeights && sheet.rowHeights.length >= 2) {
             const row2Height = sheet.rowHeights[1] || 25;
             for (const rowIdx of mergeRows) {
@@ -380,13 +398,13 @@ export default function ExcelViewer({ fileData, fileName }: ExcelViewerProps) {
                     const style = getCellStyle(cell);
                     const isHighlighted = hoveredCell?.row === rowIndex && hoveredCell?.col === colIndex;
 
-                    // Remove background fill for rows 38-51 (display rows 39-52)
-                    if (rowIndex >= 38 && rowIndex <= 51) {
+                    // Remove background fill for rows 39-52 (shifted +1 due to new header row)
+                    if (rowIndex >= 39 && rowIndex <= 52) {
                       delete style.backgroundColor;
                     }
 
-                    // Yellow fill for specific rows (0-indexed: visual rows 1,7,10,...)
-                    const yellowRows = new Set([0, 6, 9, 14, 19, 23, 26, 33, 35, 38, 45, 50, 57, 60, 66, 72, 78, 84, 91, 98, 103, 108, 113, 118, 130, 133, 139, 147]);
+                    // Yellow fill for specific rows (shifted +1 due to new header row)
+                    const yellowRows = new Set([1, 7, 10, 15, 20, 24, 27, 34, 36, 39, 46, 51, 58, 61, 67, 73, 79, 85, 92, 99, 104, 109, 114, 119, 131, 134, 140, 148]);
                     if (yellowRows.has(rowIndex)) {
                       style.backgroundColor = '#FFFF00';
                     }
