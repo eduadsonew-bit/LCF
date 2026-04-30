@@ -380,6 +380,11 @@ export default function ExcelViewer({ fileData, fileName }: ExcelViewerProps) {
                     const style = getCellStyle(cell);
                     const isHighlighted = hoveredCell?.row === rowIndex && hoveredCell?.col === colIndex;
 
+                    // Remove background fill for rows 39-51
+                    if (rowIndex >= 39 && rowIndex <= 51) {
+                      delete style.backgroundColor;
+                    }
+
                     if (!cell.style?.border) {
                       style.borderRight = '1px solid #e0e0e0';
                       style.borderBottom = '1px solid #e0e0e0';
