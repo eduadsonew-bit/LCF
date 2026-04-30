@@ -325,7 +325,7 @@ export default function ExcelViewer({ fileData, fileName }: ExcelViewerProps) {
 
       {/* Spreadsheet grid */}
       <div ref={tableRef} className="flex-1 overflow-auto bg-white">
-        <table className="border-collapse w-full" style={{ borderSpacing: 0, tableLayout: 'fixed' }}>
+        <table className="border-collapse w-full" style={{ borderSpacing: 0, tableLayout: 'fixed', border: '1px solid #a0a0a0' }}>
           {colGroup}
           <thead className="sticky top-0 z-10">
             <tr>
