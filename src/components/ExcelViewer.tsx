@@ -176,10 +176,10 @@ export default function ExcelViewer({ fileData, fileName }: ExcelViewerProps) {
           if (newData.length >= 1 && newData[0].length >= 1) {
             const totalCols = newData[0].length;
             const headerRow: CellData[] = Array.from({ length: totalCols }, (_, i) => ({
-              value: i === 0 ? 'Sábado 25 de Abril' : null,
+              value: i === 0 ? 'SÁBADO 25 DE ABRIL' : null,
               style: {
                 fill: '#2e7d32',
-                font: { color: '#ffffff', bold: true, size: 14, name: 'Arial' },
+                font: { color: '#000000', bold: true, size: 14, name: 'Arial' },
                 alignment: { horizontal: 'center' as const, vertical: 'middle' as const },
               },
               isMergedSkip: i > 0,
@@ -189,7 +189,7 @@ export default function ExcelViewer({ fileData, fileName }: ExcelViewerProps) {
             // Shift row heights down by 1
             if (sheet.rowHeights) {
               const row2Height = sheet.rowHeights[1] || sheet.rowHeights[0] || 25;
-              sheet.rowHeights.unshift(row2Height);
+              sheet.rowHeights.unshift(row2Height * 2);
             }
             sheet.rowCount = (sheet.rowCount || 0) + 1;
           }
