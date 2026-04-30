@@ -179,7 +179,7 @@ export default function ExcelViewer({ fileData, fileName }: ExcelViewerProps) {
               value: i === 0 ? 'SÁBADO 25 DE ABRIL' : null,
               style: {
                 fill: '#2e7d32',
-                font: { color: '#000000', bold: true, size: 14, name: 'Arial' },
+                font: { color: '#FFFF00', bold: true, size: 28, name: 'Arial' },
                 alignment: { horizontal: 'center' as const, vertical: 'middle' as const },
               },
               isMergedSkip: i > 0,
