@@ -128,17 +128,16 @@ export default function ExcelViewer({ fileData, fileName }: ExcelViewerProps) {
         // Keep only the first sheet
         const singleSheet = parsedSheets.length > 0 ? [parsedSheets[0]] : [];
 
-        // Remove original column A, prepend empty column so data starts at column B
+        // Remove column A and show from column B onwards, process merges
         const cleanedSheets = singleSheet.map(sheet => {
-          const emptyCell: CellData = { value: null };
-          const newData = sheet.data.map(row => [emptyCell, ...row.slice(1)]);
-          const newWidths = [42, ...(sheet.columnWidths || []).slice(1)];
-          const newCount = (sheet.columnCount || 1);
+          const newData = sheet.data.map(row => row.slice(1));
+          const newWidths = (sheet.columnWidths || []).slice(1);
+          const newCount = (sheet.columnCount || 1) - 1;
 
           // Adjust merges: shift left by 1, skip merges entirely in col A
           const newMerges = (sheet.merges || [])
-            .map(m => ({ top: m.top, left: m.left, bottom: m.bottom, right: m.right - 1 }))
-            .filter(m => m.right >= 1);
+            .map(m => ({ top: m.top, left: m.left - 1, bottom: m.bottom, right: m.right - 1 }))
+            .filter(m => m.right >= 0);
 
           const skipCells = new Set<string>();
           for (const m of newMerges) {
