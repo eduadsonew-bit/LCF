@@ -388,7 +388,7 @@ export default function ExcelViewer({ fileData, fileName }: ExcelViewerProps) {
                     // Yellow fill for specific rows (0-indexed: visual rows 1,7,10,...)
                     const yellowRows = new Set([0, 6, 9, 14, 19, 23, 26, 33, 35, 38, 45, 50, 57, 60, 66, 72, 78, 84, 91, 98, 103, 108, 113, 118, 130, 133, 139, 147]);
                     if (yellowRows.has(rowIndex)) {
-                      style.backgroundColor = '#FFF9C4';
+                      style.backgroundColor = '#FFFF00';
                     }
 
                     if (!cell.style?.border) {
