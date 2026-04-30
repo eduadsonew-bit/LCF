@@ -380,8 +380,8 @@ export default function ExcelViewer({ fileData, fileName }: ExcelViewerProps) {
                     const style = getCellStyle(cell);
                     const isHighlighted = hoveredCell?.row === rowIndex && hoveredCell?.col === colIndex;
 
-                    // Remove background fill for rows 39-51
-                    if (rowIndex >= 39 && rowIndex <= 51) {
+                    // Remove background fill for rows 38-51 (display rows 39-52)
+                    if (rowIndex >= 38 && rowIndex <= 51) {
                       delete style.backgroundColor;
                     }
 
