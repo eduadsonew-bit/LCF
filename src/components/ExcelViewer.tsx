@@ -331,35 +331,46 @@ export default function ExcelViewer({ fileData, fileName }: ExcelViewerProps) {
             <tr>
               <th
                 className="sticky left-0 z-20 bg-gray-100 border-b border-r border-gray-300 text-center p-0"
-                style={{ width: '42px', minWidth: '42px', height: '22px' }}
+                style={{ width: '42px', minWidth: '42px', height: '22px', borderTop: '1px solid #a0a0a0' }}
               >
                 <svg width="8" height="8" viewBox="0 0 10 10" className="text-gray-400 inline-block">
                   <path d="M0 0h10v10H0z" fill="none" stroke="currentColor" strokeWidth="1.5" />
                 </svg>
               </th>
-              {currentSheet.data[0]?.map((_, colIndex) => (
+              {currentSheet.data[0]?.map((_, colIndex) => {
+                const isLastThCol = colIndex === (currentSheet.data[0]?.length || 1) - 1;
+                return (
                 <th
                   key={colIndex}
                   className={"border-b border-r border-gray-300 text-center text-[11px] font-medium select-none p-0 " + (
                     hoveredCell?.col === colIndex ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
                   )}
-                  style={{ height: '22px' }}
+                  style={{ height: '22px', borderTop: '1px solid #a0a0a0', borderRight: isLastThCol ? '1px solid #a0a0a0' : undefined }}
                 >
                   {getColumnLetter(colIndex)}
                 </th>
-              ))}
+                );
+              })}
             </tr>
           </thead>
           <tbody>
             {currentSheet.data.map((row, rowIndex) => {
               const rowHeight = currentSheet.rowHeights?.[rowIndex] || 0;
+              const isFirstRow = rowIndex === 0;
+              const isLastRow = rowIndex === currentSheet.data.length - 1;
+              const totalCols = row.length;
               return (
                 <tr key={rowIndex} style={rowHeight > 0 ? { height: rowHeight + 'px' } : undefined}>
                   <td
                     className={"sticky left-0 z-10 border-b border-r border-gray-300 text-center text-[11px] font-medium select-none p-0 " + (
                       hoveredCell?.row === rowIndex ? 'bg-green-100 text-green-700' : 'bg-gray-50 text-gray-400'
                     )}
-                    style={{ width: '42px', minWidth: '42px' }}
+                    style={{
+                      width: '42px',
+                      minWidth: '42px',
+                      borderTop: isFirstRow ? '1px solid #a0a0a0' : undefined,
+                      borderBottom: isLastRow ? '1px solid #a0a0a0' : undefined
+                    }}
                   >
                     {rowIndex + 1}
                   </td>
@@ -380,6 +391,21 @@ export default function ExcelViewer({ fileData, fileName }: ExcelViewerProps) {
                       if (colIndex === 0 && !cell.style.border?.left) {
                         style.borderLeft = '1px solid #a0a0a0';
                       }
+                    }
+
+                    // Outer borders: top on first row, bottom on last row
+                    if (isFirstRow) {
+                      style.borderTop = '1px solid #a0a0a0';
+                    }
+                    if (isLastRow) {
+                      style.borderBottom = '1px solid #a0a0a0';
+                    }
+
+                    // Right border on last visible column
+                    const effectiveColSpan = cell.colSpan || 1;
+                    const isLastCol = (colIndex + effectiveColSpan) >= totalCols;
+                    if (isLastCol) {
+                      style.borderRight = '1px solid #a0a0a0';
                     }
 
                     if (isHighlighted) {
