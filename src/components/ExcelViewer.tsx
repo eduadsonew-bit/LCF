@@ -203,8 +203,29 @@ export default function ExcelViewer({ fileData, fileName }: ExcelViewerProps) {
             newData[1][0] = { ...newData[1][0], colSpan: totalCols };
           }
 
+          // Insert "Domingo 26 de Abril" row after visual row 58 (index 57)
+          if (newData.length > 57 && newData[57].length >= 1) {
+            const totalCols = newData[57].length;
+            const sundayRow: CellData[] = Array.from({ length: totalCols }, (_, i) => ({
+              value: i === 0 ? 'DOMINGO 26 DE ABRIL' : null,
+              style: {
+                fill: '#2e7d32',
+                font: { color: '#FFFF00', bold: true, size: 28, name: 'Arial' },
+                alignment: { horizontal: 'center' as const, vertical: 'middle' as const },
+              },
+              isMergedSkip: i > 0,
+              colSpan: i === 0 ? totalCols : undefined,
+            }));
+            newData.splice(58, 0, sundayRow);
+            if (sheet.rowHeights) {
+              const row2Height = sheet.rowHeights[1] || 25;
+              sheet.rowHeights.splice(58, 0, row2Height * 2);
+            }
+            sheet.rowCount = (sheet.rowCount || 0) + 1;
+          }
+
           // Merge specified rows across all columns with height equal to row 2
-          const mergeRows = [7, 10, 15, 20, 24, 27, 34, 36, 39, 46, 51, 58, 61, 67, 73, 79, 85, 92, 99, 104, 109, 114, 119, 131, 134, 140, 148];
+          const mergeRows = [7, 10, 15, 20, 24, 27, 34, 36, 39, 46, 51, 59, 62, 68, 74, 80, 86, 93, 100, 105, 110, 115, 120, 132, 135, 141, 149];
           if (sheet.rowHeights && sheet.rowHeights.length >= 2) {
             const row2Height = sheet.rowHeights[1] || 25;
             for (const rowIdx of mergeRows) {
@@ -403,8 +424,8 @@ export default function ExcelViewer({ fileData, fileName }: ExcelViewerProps) {
                       delete style.backgroundColor;
                     }
 
-                    // Yellow fill for specific rows (shifted +1 due to new header row)
-                    const yellowRows = new Set([1, 7, 10, 15, 20, 24, 27, 34, 36, 39, 46, 51, 58, 61, 67, 73, 79, 85, 92, 99, 104, 109, 114, 119, 131, 134, 140, 148]);
+                    // Yellow fill for specific rows (shifted indices for inserted rows)
+                    const yellowRows = new Set([1, 7, 10, 15, 20, 24, 27, 34, 36, 39, 46, 51, 59, 62, 68, 74, 80, 86, 93, 100, 105, 110, 115, 120, 132, 135, 141, 149]);
                     if (yellowRows.has(rowIndex)) {
                       style.backgroundColor = '#FFFF00';
                     }
