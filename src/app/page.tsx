@@ -217,15 +217,15 @@ function SponsorsCarousel({ sponsors }: { sponsors: Sponsor[] }) {
               className="flex-shrink-0 flex items-center justify-center hover:scale-110 transition-transform p-1 px-3"
             >
               {sponsor.logo ? (
-                <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-gradient-to-br from-gray-100 via-gray-200 to-gray-300 flex items-center justify-center shadow-xl overflow-hidden border border-gray-300/60 relative before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/70 before:via-gray-100/30 before:to-transparent before:rounded-full before:pointer-events-none after:absolute after:inset-0 after:bg-gradient-to-tl after:from-transparent after:via-transparent after:to-white/40 after:rounded-full after:pointer-events-none">
+                <div className="w-24 h-24 md:w-32 md:h-32 rounded-full bg-gradient-to-br from-gray-100 via-gray-200 to-gray-300 flex items-center justify-center shadow-xl overflow-hidden border border-gray-300/60 relative before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/70 before:via-gray-100/30 before:to-transparent before:rounded-full before:pointer-events-none after:absolute after:inset-0 after:bg-gradient-to-tl after:from-transparent after:via-transparent after:to-white/40 after:rounded-full after:pointer-events-none">
                   <img
                     src={sponsor.logo}
                     alt={sponsor.name}
-                    className={'w-full h-full relative z-10 mix-blend-multiply ' + (['chec', 'brilla', 'emas', 'efigas'].some(function(name) { return sponsor.name.toLowerCase().includes(name); }) ? 'object-contain p-1' : 'object-cover')}
+                    className={'w-full h-full relative z-10 mix-blend-multiply ' + (['chec', 'brilla', 'emas', 'efigas'].some(function(name) { return sponsor.name.toLowerCase().includes(name); }) ? 'object-contain p-2' : 'object-cover')}
                   />
                 </div>
               ) : (
-                <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-gradient-to-br from-gray-100 via-gray-200 to-gray-300 flex items-center justify-center shadow-xl border border-gray-300/60 relative before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/70 before:via-gray-100/30 before:to-transparent before:rounded-full before:pointer-events-none after:absolute after:inset-0 after:bg-gradient-to-tl after:from-transparent after:via-transparent after:to-white/40 after:rounded-full after:pointer-events-none">
+                <div className="w-24 h-24 md:w-32 md:h-32 rounded-full bg-gradient-to-br from-gray-100 via-gray-200 to-gray-300 flex items-center justify-center shadow-xl border border-gray-300/60 relative before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/70 before:via-gray-100/30 before:to-transparent before:rounded-full before:pointer-events-none after:absolute after:inset-0 after:bg-gradient-to-tl after:from-transparent after:via-transparent after:to-white/40 after:rounded-full after:pointer-events-none">
                   <span className="text-green-700 font-bold text-xs md:text-sm text-center px-1 relative z-10">
                     {sponsor.name}
                   </span>
