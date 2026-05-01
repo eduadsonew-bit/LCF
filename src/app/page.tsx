@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import {
   Trophy,
@@ -138,6 +138,106 @@ const navItems = [
     ]
   },
 ];
+
+// Infinite scroll sponsors carousel
+function SponsorsCarousel({ sponsors }: { sponsors: Sponsor[] }) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const offsetRef = useRef(0);
+  const animRef = useRef<number>(0);
+  const setWidthRef = useRef(0);
+  const totalCopies = 4;
+
+  useEffect(() => {
+    const container = scrollRef.current;
+    if (!container || sponsors.length === 0) return;
+
+    const updateWidth = () => {
+      if (container.scrollWidth > 0) {
+        setWidthRef.current = container.scrollWidth / totalCopies;
+      }
+    };
+
+    const timer = setTimeout(updateWidth, 100);
+    updateWidth();
+
+    const observer = new ResizeObserver(updateWidth);
+    observer.observe(container);
+
+    return () => {
+      clearTimeout(timer);
+      observer.disconnect();
+    };
+  }, [sponsors.length]);
+
+  const animate = useCallback(() => {
+    const container = scrollRef.current;
+    if (!container || sponsors.length === 0 || setWidthRef.current === 0) {
+      animRef.current = requestAnimationFrame(animate);
+      return;
+    }
+    offsetRef.current -= 3.5;
+    if (Math.abs(offsetRef.current) >= setWidthRef.current) {
+      offsetRef.current += setWidthRef.current;
+    }
+    container.style.transform = 'translateX(' + offsetRef.current + 'px)';
+    animRef.current = requestAnimationFrame(animate);
+  }, [sponsors.length]);
+
+  useEffect(() => {
+    offsetRef.current = 0;
+    setWidthRef.current = 0;
+    animRef.current = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(animRef.current);
+  }, [animate]);
+
+  if (sponsors.length === 0) {
+    return (
+      <div className="px-4">
+        <div className="text-center mb-8">
+          <h2 className="text-3xl font-bold text-[#fbbf24]">Nuestros Patrocinadores</h2>
+        </div>
+        <div className="text-center py-6">
+          <Users className="h-12 w-12 text-green-200 mx-auto mb-3" />
+          <p className="text-green-100">Pronto anunciaremos nuestros patrocinadores</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="px-4">
+      <div className="text-center mb-8">
+        <h2 className="text-3xl font-bold text-[#fbbf24]">Nuestros Patrocinadores</h2>
+      </div>
+      <div className="overflow-hidden py-2">
+        <div ref={scrollRef} className="flex will-change-transform">
+          {[...sponsors, ...sponsors, ...sponsors, ...sponsors].map((sponsor, index) => (
+            <div
+              key={sponsor.id + '-' + index}
+              className="flex-shrink-0 flex items-center justify-center hover:scale-110 transition-transform p-1 px-3"
+            >
+              {sponsor.logo ? (
+                <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-gradient-to-br from-gray-100 via-gray-200 to-gray-300 flex items-center justify-center shadow-xl overflow-hidden border border-gray-300/60 relative before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/70 before:via-gray-100/30 before:to-transparent before:rounded-full before:pointer-events-none after:absolute after:inset-0 after:bg-gradient-to-tl after:from-transparent after:via-transparent after:to-white/40 after:rounded-full after:pointer-events-none">
+                  <img
+                    src={sponsor.logo}
+                    alt={sponsor.name}
+                    className={'w-full h-full relative z-10 mix-blend-multiply ' + (['chec', 'brilla', 'emas', 'efigas'].some(function(name) { return sponsor.name.toLowerCase().includes(name); }) ? 'object-contain p-1' : 'object-cover')}
+                  />
+                </div>
+              ) : (
+                <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-gradient-to-br from-gray-100 via-gray-200 to-gray-300 flex items-center justify-center shadow-xl border border-gray-300/60 relative before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/70 before:via-gray-100/30 before:to-transparent before:rounded-full before:pointer-events-none after:absolute after:inset-0 after:bg-gradient-to-tl after:from-transparent after:via-transparent after:to-white/40 after:rounded-full after:pointer-events-none">
+                  <span className="text-green-700 font-bold text-xs md:text-sm text-center px-1 relative z-10">
+                    {sponsor.name}
+                  </span>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function HomePage() {
   const [api, setApi] = useState<CarouselApi>();
@@ -446,63 +546,7 @@ export default function HomePage() {
 
             {/* Sponsors Section */}
             <section className="w-full py-6 bg-gradient-to-br from-green-600 to-green-800 text-white relative z-10 overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/5 before:to-transparent before:pointer-events-none">
-              <div className="px-4">
-                <div className="text-center mb-8">
-                  <h2 className="text-3xl font-bold text-[#fbbf24]">Nuestros Patrocinadores</h2>
-                </div>
-
-                {sponsors.length > 0 ? (
-                  <div className="relative">
-                    <div className="overflow-hidden py-2">
-                      <div
-                        className="flex will-change-transform"
-                        style={{
-                          animation: 'scrollCarousel 5s linear infinite',
-                        }}
-                      >
-                        {[...sponsors, ...sponsors].map((sponsor, index) => (
-                          <div
-                            key={`${sponsor.id}-${index}`}
-                            className="flex-shrink-0 flex items-center justify-center hover:scale-110 transition-transform p-2 px-6"
-                          >
-                            {sponsor.logo ? (
-                              <div className="w-28 h-28 md:w-36 md:h-36 rounded-full bg-gradient-to-br from-gray-100 via-gray-200 to-gray-300 flex items-center justify-center shadow-xl overflow-hidden border border-gray-300/60 relative before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/70 before:via-gray-100/30 before:to-transparent before:rounded-full before:pointer-events-none after:absolute after:inset-0 after:bg-gradient-to-tl after:from-transparent after:via-transparent after:to-white/40 after:rounded-full after:pointer-events-none">
-                                <img
-                                  src={sponsor.logo}
-                                  alt={sponsor.name}
-                                  className={`w-full h-full relative z-10 mix-blend-multiply ${['chec', 'brilla', 'emas', 'efigas'].some(name => sponsor.name.toLowerCase().includes(name)) ? 'object-contain p-2' : 'object-cover'}`}
-                                />
-                              </div>
-                            ) : (
-                              <div className="w-28 h-28 md:w-36 md:h-36 rounded-full bg-gradient-to-br from-gray-100 via-gray-200 to-gray-300 flex items-center justify-center shadow-xl border border-gray-300/60 relative before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/70 before:via-gray-100/30 before:to-transparent before:rounded-full before:pointer-events-none after:absolute after:inset-0 after:bg-gradient-to-tl after:from-transparent after:via-transparent after:to-white/40 after:rounded-full after:pointer-events-none">
-                                <span className="text-green-700 font-bold text-sm md:text-base text-center px-2 relative z-10">
-                                  {sponsor.name}
-                                </span>
-                              </div>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="text-center py-6">
-                    <Users className="h-12 w-12 text-green-200 mx-auto mb-3" />
-                    <p className="text-green-100">Pronto anunciaremos nuestros patrocinadores</p>
-                  </div>
-                )}
-              </div>
-
-              <style jsx global>{`
-                @keyframes scrollCarousel {
-                  0% {
-                    transform: translateX(0);
-                  }
-                  100% {
-                    transform: translateX(-50%);
-                  }
-                }
-              `}</style>
+              <SponsorsCarousel sponsors={sponsors} />
             </section>
 
             {/* Tournaments Section */}
