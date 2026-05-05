@@ -217,11 +217,11 @@ function SponsorsCarousel({ sponsors }: { sponsors: Sponsor[] }) {
               className="flex-shrink-0 flex items-center justify-center hover:scale-110 transition-transform p-1 px-3"
             >
               {sponsor.logo ? (
-                <div className="w-28 h-28 md:w-36 md:h-36 rounded-full bg-gradient-to-br from-gray-100 via-gray-200 to-gray-300 flex items-center justify-center shadow-xl overflow-hidden border border-gray-300/60 relative before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/70 before:via-gray-100/30 before:to-transparent before:rounded-full before:pointer-events-none after:absolute after:inset-0 after:bg-gradient-to-tl after:from-transparent after:via-transparent after:to-white/40 after:rounded-full after:pointer-events-none">
+                <div className={"w-28 h-28 md:w-36 md:h-36 rounded-full flex items-center justify-center shadow-xl overflow-hidden border relative before:absolute before:inset-0 before:bg-gradient-to-br before:rounded-full before:pointer-events-none after:absolute after:inset-0 after:bg-gradient-to-tl after:rounded-full after:pointer-events-none " + (sponsor.name.toLowerCase().includes("ron viejo") ? "bg-red-700 border-red-800/60 before:from-white/20 before:via-transparent before:to-transparent after:from-transparent after:via-transparent after:to-black/20" : sponsor.name.toLowerCase().includes("molten") ? "bg-black border-gray-600/60 before:from-white/10 before:via-transparent before:to-transparent after:from-transparent after:via-transparent after:to-gray-800/30" : "bg-gradient-to-br from-gray-100 via-gray-200 to-gray-300 border-gray-300/60 before:from-white/70 before:via-gray-100/30 before:to-transparent after:from-transparent after:via-transparent after:to-white/40")}>
                   <img
                     src={sponsor.logo}
                     alt={sponsor.name}
-                    className={"w-full h-full relative z-10 " + (sponsor.name.toLowerCase().includes("ron viejo") ? "object-cover" : "object-contain p-2 mix-blend-multiply")}
+                    className={"w-full h-full relative z-10 " + (sponsor.name.toLowerCase().includes("ron viejo") || sponsor.name.toLowerCase().includes("molten") ? "object-cover" : "object-contain p-2 mix-blend-multiply")}
                   />
                 </div>
               ) : (
