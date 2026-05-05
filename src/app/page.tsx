@@ -221,7 +221,7 @@ function SponsorsCarousel({ sponsors }: { sponsors: Sponsor[] }) {
                   <img
                     src={sponsor.logo}
                     alt={sponsor.name}
-                    className="w-full h-full relative z-10 object-contain p-2"
+                    className="w-full h-full relative z-10 object-contain p-2 mix-blend-multiply"
                   />
                 </div>
               ) : (
