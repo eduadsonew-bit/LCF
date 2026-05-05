@@ -221,7 +221,7 @@ function SponsorsCarousel({ sponsors }: { sponsors: Sponsor[] }) {
                   <img
                     src={sponsor.logo}
                     alt={sponsor.name}
-                    className={'w-full h-full relative z-10 mix-blend-multiply ' + (['chec', 'brilla', 'emas', 'efigas'].some(function(name) { return sponsor.name.toLowerCase().includes(name); }) ? 'object-contain p-2' : 'object-cover')}
+                    className="w-full h-full relative z-10 object-contain p-2"
                   />
                 </div>
               ) : (
