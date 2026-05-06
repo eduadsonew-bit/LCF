@@ -223,7 +223,7 @@ function SponsorsCarousel({ sponsors }: { sponsors: Sponsor[] }) {
                       src={sponsor.logo}
                       alt={sponsor.name}
                       className="relative z-10 mix-blend-multiply"
-                      style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 15%' }}
+                      style={{ width: '90%', height: '90%', objectFit: 'contain', objectPosition: 'center 0%' }}
                     />
                   </div>
                 ) : (
