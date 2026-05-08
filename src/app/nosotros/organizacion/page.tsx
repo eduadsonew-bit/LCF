@@ -18,6 +18,8 @@ import {
   Handshake,
   Building2,
   Scale,
+  Heart,
+  Megaphone,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -114,24 +116,24 @@ export default function OrganizacionPage() {
   // Valores de la liga
   const valores = [
     {
-      nombre: "Respeto",
-      descripcion: "Valoramos la integridad y el fair play en cada partido.",
-      icon: Handshake,
+      nombre: "Liderazgo",
+      descripcion: "Gestión de procesos que garanticen el ejercicio efectivo y progresivo de los derechos del deporte aficionado en el departamento de Caldas.",
+      icon: Award,
     },
     {
-      nombre: "Compromiso",
-      descripcion: "Dedicación total al desarrollo del fútbol regional.",
-      icon: Target,
-    },
-    {
-      nombre: "Excelencia",
-      descripcion: "Buscamos la mejora continua en todo lo que hacemos.",
-      icon: Star,
-    },
-    {
-      nombre: "Trabajo en Equipo",
-      descripcion: "La unión hace la fuerza dentro y fuera del campo.",
+      nombre: "Participación",
+      descripcion: "Fortalecimiento de procesos que vinculen a los clubes y deportistas en la formación, diseño y seguimiento de políticas y programas de capacitación y formación deportiva como elementos dinamizadores del deporte aficionado de Caldas.",
       icon: Users,
+    },
+    {
+      nombre: "Respeto, Valoración y Promoción",
+      descripcion: "De la diversidad cultural, recreativa y deportiva como elemento que enriquece la identidad y la dinámica social del deporte aficionado.",
+      icon: Heart,
+    },
+    {
+      nombre: "Difusión de la Gestión",
+      descripcion: "Información oportuna, clara, precisa y útil sobre la intervención de la liga en el deporte aficionado del departamento, utilizando de manera óptima los medios existentes.",
+      icon: Megaphone,
     },
   ];
 
@@ -265,7 +267,7 @@ export default function OrganizacionPage() {
                       <IconComponent className="h-6 w-6" />
                     </div>
                     <h3 className="font-bold text-gray-800 mb-2">{valor.nombre}</h3>
-                    <p className="text-gray-600 text-sm">{valor.descripcion}</p>
+                    <p className="text-gray-600 text-sm text-justify">{valor.descripcion}</p>
                   </CardContent>
                 </Card>
               );
