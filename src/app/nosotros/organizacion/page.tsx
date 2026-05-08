@@ -214,10 +214,10 @@ export default function OrganizacionPage() {
                   </div>
                   <h3 className="text-xl font-bold text-gray-800">Nuestra Misión</h3>
                 </div>
-                <p className="text-gray-600 leading-relaxed text-sm font-bold text-green-700 mb-2">
+                <p className="text-gray-600 leading-relaxed text-sm font-bold text-green-700 mb-2 text-center">
                   &ldquo;FORMANDO FUTBOLISTAS CON SENTIDO CIUDADANO&rdquo;
                 </p>
-                <p className="text-gray-600 leading-relaxed">
+                <p className="text-gray-600 leading-relaxed text-justify">
                   La Liga Caldense de Futbol, se identifica en su quehacer deportivo, no solo con todas las actividades orientadas a promover, fomentar, fortalecer y organizar el futbol aficionado en el departamento de Caldas, como un espacio social privilegiado para la validación de los derechos de los ciudadanos al deporte y la sana utilización del tiempo libre, sino también con aquellas centradas en la competencia y el rendimiento deportivo que canalizadas mediante los torneos internos y nacionales, le ofrecen a sus afiliados amplias oportunidades de reconocimiento social como respuesta a sus aspiraciones, intereses y expectativas en este campo especifico. Trabajando además a partir de procesos sociales, la promoción del ser humano mediante el fortalecimiento de sus valoraciones éticas, estéticas espirituales, cognitivas y comunicativas que se dinamizan en la formación de deportistas con sentido ciudadano.
                 </p>
               </CardContent>
