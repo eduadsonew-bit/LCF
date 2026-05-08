@@ -232,10 +232,8 @@ export default function OrganizacionPage() {
                   </div>
                   <h3 className="text-xl font-bold text-gray-800">Nuestra Visión</h3>
                 </div>
-                <p className="text-gray-600 leading-relaxed">
-                  Ser la liga de fútbol más reconocida de la región, formando deportistas íntegros 
-                  y contribuyendo al desarrollo de comunidades saludables y unidas a través del 
-                  deporte, siendo referente de excelencia organizativa.
+                <p className="text-gray-600 leading-relaxed text-justify">
+                  Los nuevos horizontes de la Liga Caldense de Futbol, se orientan dentro de un proceso renovador de su filosofía, a partir del año 2019 transversaliza toda su cultura organizacional para convertirse en una empresa autogestionadora, líder en la prestación de servicios de excelente calidad, que respondan efectiva y eficientemente en las necesidades reales y sentidas del futbol aficionado en el departamento de Caldas, mediante la gestión, ejecución, evaluación, seguimiento y control de proyectos propios del sector; apoyados en técnicas modernas de organización y desarrollo deportivo, que proporcione a sus afiliados un ambiente más satisfactorio dentro del contexto de los torneos, para facilitar altos logros en el ámbito nacional.
                 </p>
               </CardContent>
             </Card>
