@@ -127,7 +127,6 @@ const navItems = [
   },
   { label: "Noticias", href: "/noticias" },
   { label: "Eventos", href: "/eventos" },
-  { label: "Proyectos", href: "/proyectos" },
   { 
     label: "Nosotros", 
     href: "/nosotros",
