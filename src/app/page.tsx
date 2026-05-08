@@ -112,7 +112,7 @@ interface SocialMediaItem {
   order: number;
 }
 
-// Navigation items - SIN CONTACTO
+// Navigation items
 const navItems = [
   { label: "Inicio", href: "/" },
   { label: "Torneos", href: "/torneos" },
@@ -137,6 +137,7 @@ const navItems = [
       { label: "Clubes", href: "/nosotros/clubes" },
     ]
   },
+  { label: "Contáctenos", href: "/contactenos" },
 ];
 
 // Infinite scroll sponsors carousel
