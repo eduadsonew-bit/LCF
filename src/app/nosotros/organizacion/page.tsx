@@ -245,7 +245,7 @@ export default function OrganizacionPage() {
         {/* Valores */}
         <section className="mb-12">
           <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold text-gray-800">Nuestros Valores</h2>
+            <h2 className="text-2xl font-bold text-gray-800">Nuestros Principios</h2>
             <p className="text-gray-600">Los principios que nos definen</p>
           </div>
 
