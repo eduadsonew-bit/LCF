@@ -124,51 +124,7 @@ export default function ExcelViewerRaw({ fileData, fileName }: ExcelViewerProps)
         if (!response.ok) throw new Error('Error al procesar el archivo Excel');
         const data = await response.json();
         const parsedSheets: SheetData[] = data.sheets || [];
-
-        // Process merges: apply rowSpan/colSpan and mark skipped cells
-        const processedSheets = parsedSheets.map(sheet => {
-          const skipCells = new Set<string>();
-          for (const m of (sheet.merges || [])) {
-            for (let r = m.top; r <= m.bottom; r++) {
-              for (let c = m.left; c <= m.right; c++) {
-                if (r === m.top && c === m.left) continue;
-                skipCells.add((r - 1) + '-' + c);
-              }
-            }
-          }
-
-          const newData = sheet.data.map(row => row.map(cell => ({ ...cell })));
-
-          // Apply rowSpan/colSpan to master cells
-          for (const m of (sheet.merges || [])) {
-            const masterIdx = m.top - 1;
-            const masterCol = m.left;
-            if (newData[masterIdx] && newData[masterIdx][masterCol]) {
-              newData[masterIdx][masterCol] = {
-                ...newData[masterIdx][masterCol],
-                rowSpan: m.bottom - m.top + 1,
-                colSpan: m.right - m.left + 1,
-              };
-            }
-          }
-
-          // Mark merged skip cells
-          for (const key of skipCells) {
-            const parts = key.split('-');
-            const r = parseInt(parts[0]);
-            const c = parseInt(parts[1]);
-            if (newData[r] && newData[r][c]) {
-              newData[r][c] = { ...newData[r][c], isMergedSkip: true };
-            }
-          }
-
-          return {
-            ...sheet,
-            data: newData,
-          };
-        });
-
-        setSheets(processedSheets);
+        setSheets(parsedSheets);
       } catch (err) {
         console.error('Error loading Excel:', err);
         setError('Error al cargar el archivo Excel');
