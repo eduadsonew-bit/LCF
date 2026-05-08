@@ -125,20 +125,20 @@ export default function ExcelViewerRaw({ fileData, fileName }: ExcelViewerProps)
         const data = await response.json();
         const parsedSheets: SheetData[] = data.sheets || [];
 
-        // Merge cells A to F (index 0 to 5) in specified rows and center text
+        // Merge cells A to E (index 0 to 4) in specified rows and center text
         // Rows are 1-based from Excel, convert to 0-based array index
-        const mergeRows = [2, 8, 13, 20, 26, 29, 36, 43, 45, 48, 51, 69, 70, 73, 76, 79, 82, 86, 90].map(r => r - 1);
+        const mergeRows = [1, 2, 8, 13, 20, 26, 29, 36, 43, 45, 48, 51, 69, 70, 73, 76, 79, 82, 86, 90].map(r => r - 1);
         const processedSheets = parsedSheets.map(sheet => {
           for (const rowIdx of mergeRows) {
-            if (sheet.data.length > rowIdx && sheet.data[rowIdx].length >= 6) {
-              // Mark cells B-F (index 1-5) as merged skip
-              for (let c = 1; c <= 5 && c < sheet.data[rowIdx].length; c++) {
+            if (sheet.data.length > rowIdx && sheet.data[rowIdx].length >= 5) {
+              // Mark cells B-E (index 1-4) as merged skip
+              for (let c = 1; c <= 4 && c < sheet.data[rowIdx].length; c++) {
                 sheet.data[rowIdx][c] = { ...sheet.data[rowIdx][c], isMergedSkip: true };
               }
-              // Apply colSpan and center alignment to master cell A
+              // Apply colSpan=5 (A to E) and center alignment to master cell A
               sheet.data[rowIdx][0] = {
                 ...sheet.data[rowIdx][0],
-                colSpan: 6,
+                colSpan: 5,
                 style: {
                   ...sheet.data[rowIdx][0].style,
                   alignment: {
