@@ -342,6 +342,7 @@ export default function ExcelViewerRaw({ fileData, fileName }: ExcelViewerProps)
                     // Yellow font for title rows
                     if (isYellowFontRow) {
                       style.color = '#FFFF00';
+                      style.fontSize = '16pt';
                     }
 
                     if (!cell.style?.border) {
