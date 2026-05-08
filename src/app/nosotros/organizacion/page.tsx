@@ -275,8 +275,34 @@ export default function OrganizacionPage() {
           </div>
         </section>
 
-        {/* Autoridades */}
+        {/* Estructura Organizativa */}
         <section className="mb-12">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl font-bold text-gray-800">Estructura Organizativa</h2>
+            <p className="text-gray-600">Cómo estamos organizados</p>
+          </div>
+
+          <Card className="shadow-lg">
+            <CardContent className="p-6">
+              <div className="grid md:grid-cols-3 gap-6">
+                <div className="text-center p-6 bg-green-50 rounded-xl">
+                  <Goal className="h-10 w-10 text-green-600 mx-auto mb-4" />
+                  <h3 className="font-bold text-gray-800 mb-2">Asamblea General</h3>
+                  <p className="text-gray-600 text-sm">Máximo órgano de gobierno</p>
+                </div>
+                <div className="text-center p-6 bg-amber-50 rounded-xl">
+                  <Shield className="h-10 w-10 text-amber-600 mx-auto mb-4" />
+                  <h3 className="font-bold text-gray-800 mb-2">Junta Directiva</h3>
+                  <p className="text-gray-600 text-sm">Órgano de administración</p>
+                </div>
+                <ComisionesCard />
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+
+        {/* Autoridades */}
+        <section>
           <div className="text-center mb-8">
             <h2 className="text-2xl font-bold text-gray-800">Nuestras Autoridades</h2>
             <p className="text-gray-600">El equipo que lidera nuestra institución</p>
@@ -312,32 +338,6 @@ export default function OrganizacionPage() {
               );
             })}
           </div>
-        </section>
-
-        {/* Estructura Organizativa */}
-        <section>
-          <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold text-gray-800">Estructura Organizativa</h2>
-            <p className="text-gray-600">Cómo estamos organizados</p>
-          </div>
-
-          <Card className="shadow-lg">
-            <CardContent className="p-6">
-              <div className="grid md:grid-cols-3 gap-6">
-                <div className="text-center p-6 bg-green-50 rounded-xl">
-                  <Goal className="h-10 w-10 text-green-600 mx-auto mb-4" />
-                  <h3 className="font-bold text-gray-800 mb-2">Asamblea General</h3>
-                  <p className="text-gray-600 text-sm">Máximo órgano de gobierno</p>
-                </div>
-                <div className="text-center p-6 bg-amber-50 rounded-xl">
-                  <Shield className="h-10 w-10 text-amber-600 mx-auto mb-4" />
-                  <h3 className="font-bold text-gray-800 mb-2">Junta Directiva</h3>
-                  <p className="text-gray-600 text-sm">Órgano de administración</p>
-                </div>
-                <ComisionesCard />
-              </div>
-            </CardContent>
-          </Card>
         </section>
       </main>
 
