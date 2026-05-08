@@ -127,7 +127,7 @@ export default function ExcelViewerRaw({ fileData, fileName }: ExcelViewerProps)
 
         // Merge cells A to E (index 0 to 4) in specified rows and center text
         // Rows are 1-based from Excel, convert to 0-based array index
-        const mergeRows = [1, 2, 8, 13, 20, 26, 29, 36, 43, 45, 48, 51, 69, 70, 73, 76, 79, 82, 86, 90].map(r => r - 1);
+        const mergeRows = [1, 2, 8, 13, 20, 26, 29, 36, 43, 45, 48, 51, 69, 70, 73, 76, 79, 82, 86, 90, 94].map(r => r - 1);
         const processedSheets = parsedSheets.map(sheet => {
           for (const rowIdx of mergeRows) {
             if (sheet.data.length > rowIdx && sheet.data[rowIdx].length >= 5) {
