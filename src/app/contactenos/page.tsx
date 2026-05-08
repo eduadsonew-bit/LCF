@@ -10,11 +10,6 @@ import {
   Send,
   ChevronRight,
   Home,
-  Instagram,
-  Facebook,
-  Twitter,
-  Youtube,
-  Globe,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -74,13 +69,6 @@ export default function ContactenosPage() {
     },
   ];
 
-  const redesSociales = [
-    { name: "Facebook", icon: Facebook, color: "hover:bg-blue-600", url: "#" },
-    { name: "Instagram", icon: Instagram, color: "hover:bg-pink-600", url: "#" },
-    { name: "Twitter", icon: Twitter, color: "hover:bg-sky-500", url: "#" },
-    { name: "YouTube", icon: Youtube, color: "hover:bg-red-600", url: "#" },
-  ];
-
   return (
     <SiteLayout>
       {/* Header */}
@@ -138,11 +126,9 @@ export default function ContactenosPage() {
           </div>
         </section>
 
-        {/* Formulario de Contacto y Mapa */}
+        {/* Formulario de Contacto */}
         <section className="mb-16">
-          <div className="grid md:grid-cols-2 gap-8">
-            {/* Formulario */}
-            <Card className="bg-white shadow-xl border-0 overflow-hidden">
+          <Card className="bg-white shadow-xl border-0 overflow-hidden max-w-2xl mx-auto">
               <CardContent className="p-0">
                 <div className="h-2 bg-gradient-to-r from-green-500 to-green-600" />
                 <div className="p-8">
@@ -220,139 +206,10 @@ export default function ContactenosPage() {
                   </form>
                 </div>
               </CardContent>
-            </Card>
-
-            {/* Mapa / Ubicación */}
-            <Card className="bg-white shadow-xl border-0 overflow-hidden">
-              <CardContent className="p-0">
-                <div className="h-2 bg-gradient-to-r from-[#fbbf24] to-amber-500" />
-                <div className="p-8">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#fbbf24] to-amber-500 flex items-center justify-center shadow-lg">
-                      <MapPin className="h-6 w-6 text-white" />
-                    </div>
-                    <div>
-                      <h2 className="text-2xl font-bold text-gray-800">Nuestra Ubicación</h2>
-                      <p className="text-gray-500 text-sm">Visítanos en nuestras oficinas</p>
-                    </div>
-                  </div>
-
-                  {/* Mapa placeholder */}
-                  <div className="w-full h-64 md:h-80 bg-gradient-to-br from-green-50 to-green-100 rounded-xl flex items-center justify-center border-2 border-dashed border-green-300 mb-6">
-                    <div className="text-center">
-                      <MapPin className="h-12 w-12 text-green-400 mx-auto mb-3" />
-                      <p className="text-green-600 font-medium">Calle 5 #12-34</p>
-                      <p className="text-green-500 text-sm">Manizales, Caldas</p>
-                    </div>
-                  </div>
-
-                  {/* Redes Sociales */}
-                  <div>
-                    <h3 className="text-lg font-bold text-gray-800 mb-4">Síguenos en Redes Sociales</h3>
-                    <div className="flex gap-3">
-                      {redesSociales.map((red) => {
-                        const IconComponent = red.icon;
-                        return (
-                          <button
-                            key={red.name}
-                            className={"w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center text-gray-600 transition-all duration-300 " + red.color + " hover:text-white hover:shadow-lg hover:scale-110"}
-                            title={red.name}
-                          >
-                            <IconComponent className="h-6 w-6" />
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+          </Card>
         </section>
 
-        {/* Preguntas Frecuentes */}
-        <section className="mb-16">
-          <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold text-gray-800 mb-2">
-              Preguntas <span className="text-green-700">Frecuentes</span>
-            </h2>
-            <p className="text-gray-600">Las dudas más comunes de nuestra comunidad</p>
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card className="bg-white shadow-lg hover:shadow-xl transition-all duration-300 border-0 overflow-hidden">
-              <CardContent className="p-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center flex-shrink-0">
-                    <Globe className="h-5 w-5 text-green-600" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-gray-800 mb-2">¿Cómo puedo inscribir mi equipo?</h3>
-                    <p className="text-gray-600 text-sm leading-relaxed">
-                      Puedes comunicarte con nosotros a través de este formulario o acercarte a nuestras 
-                      oficinas. Nuestro equipo te guiará en todo el proceso de inscripción y te 
-                      proporcionará los requisitos necesarios.
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-white shadow-lg hover:shadow-xl transition-all duration-300 border-0 overflow-hidden">
-              <CardContent className="p-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center flex-shrink-0">
-                    <MessageSquare className="h-5 w-5 text-amber-600" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-gray-800 mb-2">¿Cuánto cuesta la inscripción?</h3>
-                    <p className="text-gray-600 text-sm leading-relaxed">
-                      Los costos de inscripción varían según la categoría y el torneo. Contáctanos 
-                      directamente para recibir información detallada sobre las tarifas vigentes 
-                      y los métodos de pago disponibles.
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-white shadow-lg hover:shadow-xl transition-all duration-300 border-0 overflow-hidden">
-              <CardContent className="p-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
-                    <Clock className="h-5 w-5 text-blue-600" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-gray-800 mb-2">¿Cuándo inician los torneos?</h3>
-                    <p className="text-gray-600 text-sm leading-relaxed">
-                      Los torneos se programan a lo largo del año con diferentes categorías. Sigue 
-                      nuestras redes sociales o consulta la sección de Programación para conocer 
-                      las fechas exactas de cada competencia.
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-white shadow-lg hover:shadow-xl transition-all duration-300 border-0 overflow-hidden">
-              <CardContent className="p-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center flex-shrink-0">
-                    <Phone className="h-5 w-5 text-purple-600" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-gray-800 mb-2">¿Cómo puedo ser patrocinador?</h3>
-                    <p className="text-gray-600 text-sm leading-relaxed">
-                      Si deseas apoyar la liga como patrocinador, envíanos un mensaje con el asunto 
-                      &quot;Patrocinio&quot; y te compartiremos nuestro portafolio de alianzas 
-                      comerciales con todas las opciones disponibles.
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </section>
       </div>
     </SiteLayout>
   );
