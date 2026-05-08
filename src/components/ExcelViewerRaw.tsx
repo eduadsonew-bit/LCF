@@ -124,7 +124,33 @@ export default function ExcelViewerRaw({ fileData, fileName }: ExcelViewerProps)
         if (!response.ok) throw new Error('Error al procesar el archivo Excel');
         const data = await response.json();
         const parsedSheets: SheetData[] = data.sheets || [];
-        setSheets(parsedSheets);
+
+        // Merge cells A to F (index 0 to 5) in row 1 (index 0) and center text
+        const processedSheets = parsedSheets.map(sheet => {
+          if (sheet.data.length >= 1 && sheet.data[0].length >= 6) {
+            const totalCols = sheet.data[0].length;
+            // Mark cells B-F (index 1-5) as merged skip
+            for (let c = 1; c <= 5 && c < totalCols; c++) {
+              sheet.data[0][c] = { ...sheet.data[0][c], isMergedSkip: true };
+            }
+            // Apply colSpan and center alignment to master cell A
+            sheet.data[0][0] = {
+              ...sheet.data[0][0],
+              colSpan: 6,
+              style: {
+                ...sheet.data[0][0].style,
+                alignment: {
+                  ...sheet.data[0][0].style?.alignment,
+                  horizontal: 'center',
+                  vertical: 'middle',
+                },
+              },
+            };
+          }
+          return sheet;
+        });
+
+        setSheets(processedSheets);
       } catch (err) {
         console.error('Error loading Excel:', err);
         setError('Error al cargar el archivo Excel');
