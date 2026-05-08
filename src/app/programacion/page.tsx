@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 const ExcelViewer = dynamic(() => import("@/components/ExcelViewer"), { ssr: false });
+const ExcelViewerRaw = dynamic(() => import("@/components/ExcelViewerRaw"), { ssr: false });
 
 interface ScheduleFile {
   id: string;
@@ -148,6 +149,10 @@ export default function ProgramacionPage() {
 
     // For Excel files, render ExcelViewer directly
     if (isExcel) {
+      // Use raw viewer for files that should be displayed as-is
+      const useRawViewer = selectedFile.fileName.includes('MAYO') || selectedFile.fileName.includes('Mayo');
+      const ViewerComponent = useRawViewer ? ExcelViewerRaw : ExcelViewer;
+
       return (
         <div className="space-y-4">
           <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center gap-3">
@@ -168,7 +173,7 @@ export default function ProgramacionPage() {
           </div>
 
           <div className="rounded-lg border border-gray-200 overflow-hidden bg-white">
-            <ExcelViewer fileData={selectedFile.fileData} fileName={selectedFile.fileName} />
+            <ViewerComponent fileData={selectedFile.fileData} fileName={selectedFile.fileName} />
           </div>
         </div>
       );
