@@ -129,20 +129,26 @@ export default function ExcelViewerRaw({ fileData, fileName }: ExcelViewerProps)
         // Rows are 1-based from Excel, convert to 0-based array index
         const mergeRows = [1, 2, 8, 13, 20, 26, 29, 36, 43, 45, 48, 51, 69, 70, 73, 76, 79, 82, 86, 90, 94].map(r => r - 1);
         const processedSheets = parsedSheets.map(sheet => {
+          // Remove column F (index 5) from each row
+          const newData = sheet.data.map(row => [...row.slice(0, 5), ...row.slice(6)]);
+          const newWidths = (sheet.columnWidths || []).length > 5
+            ? [...sheet.columnWidths.slice(0, 5), ...sheet.columnWidths.slice(6)]
+            : sheet.columnWidths;
+
           for (const rowIdx of mergeRows) {
-            if (sheet.data.length > rowIdx && sheet.data[rowIdx].length >= 5) {
+            if (newData.length > rowIdx && newData[rowIdx].length >= 5) {
               // Mark cells B-E (index 1-4) as merged skip
-              for (let c = 1; c <= 4 && c < sheet.data[rowIdx].length; c++) {
-                sheet.data[rowIdx][c] = { ...sheet.data[rowIdx][c], isMergedSkip: true };
+              for (let c = 1; c <= 4 && c < newData[rowIdx].length; c++) {
+                newData[rowIdx][c] = { ...newData[rowIdx][c], isMergedSkip: true };
               }
               // Apply colSpan=5 (A to E) and center alignment to master cell A
-              sheet.data[rowIdx][0] = {
-                ...sheet.data[rowIdx][0],
+              newData[rowIdx][0] = {
+                ...newData[rowIdx][0],
                 colSpan: 5,
                 style: {
-                  ...sheet.data[rowIdx][0].style,
+                  ...newData[rowIdx][0].style,
                   alignment: {
-                    ...sheet.data[rowIdx][0].style?.alignment,
+                    ...newData[rowIdx][0].style?.alignment,
                     horizontal: 'center',
                     vertical: 'middle',
                   },
@@ -150,7 +156,12 @@ export default function ExcelViewerRaw({ fileData, fileName }: ExcelViewerProps)
               };
             }
           }
-          return sheet;
+          return {
+            ...sheet,
+            data: newData,
+            columnWidths: newWidths,
+            columnCount: (sheet.columnCount || 0) - 1,
+          };
         });
 
         setSheets(processedSheets);
