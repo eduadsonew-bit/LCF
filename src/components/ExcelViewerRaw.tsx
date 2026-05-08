@@ -297,6 +297,9 @@ export default function ExcelViewerRaw({ fileData, fileName }: ExcelViewerProps)
               const isFirstRow = rowIndex === 0;
               const isLastRow = rowIndex === currentSheet.data.length - 1;
               const totalCols = row.length;
+              // Yellow fill for specific rows (0-based: subtract 1 from Excel row numbers)
+              const yellowRows = new Set([2, 8, 13, 20, 26, 29, 36, 43, 45, 48, 51, 70, 73, 76, 79, 82, 86, 90, 94].map(r => r - 1));
+              const isYellowRow = yellowRows.has(rowIndex);
               return (
                 <tr key={rowIndex} style={rowHeight > 0 ? { height: rowHeight + 'px' } : undefined}>
                   <td
@@ -317,6 +320,11 @@ export default function ExcelViewerRaw({ fileData, fileName }: ExcelViewerProps)
 
                     const style = getCellStyle(cell);
                     const isHighlighted = hoveredCell?.row === rowIndex && hoveredCell?.col === colIndex;
+
+                    // Yellow fill for specified rows
+                    if (isYellowRow) {
+                      style.backgroundColor = '#FFFF00';
+                    }
 
                     if (!cell.style?.border) {
                       style.borderRight = '1px solid #e0e0e0';
