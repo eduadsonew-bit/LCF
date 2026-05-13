@@ -164,16 +164,10 @@ export default function OrganizacionPage() {
       icon: Award,
     },
     {
-      cargo: "Director Técnico",
+      cargo: "Vocal",
       nombre: "",
-      descripcion: "Supervisando el aspecto deportivo y técnico de la liga.",
-      icon: Trophy,
-    },
-    {
-      cargo: "Director de Comunicaciones",
-      nombre: "",
-      descripcion: "Conectando la liga con la comunidad y medios.",
-      icon: Flag,
+      descripcion: "Representando la voz de los clubes afiliados.",
+      icon: Handshake,
     },
   ];
 
