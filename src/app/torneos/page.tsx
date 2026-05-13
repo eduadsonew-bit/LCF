@@ -44,7 +44,7 @@ export default function TorneosPage() {
       try {
         const res = await fetch('/api/public/tournaments');
         const data = await res.json();
-        setTournaments(data);
+        setTournaments(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error('Error fetching tournaments:', error);
       } finally {
