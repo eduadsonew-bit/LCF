@@ -142,31 +142,31 @@ export default function OrganizacionPage() {
     {
       cargo: "Presidente",
       nombre: "",
-      descripcion: "Liderando la liga con pasión y dedicación desde 2018.",
+      descripcion: "",
       icon: Award,
     },
     {
       cargo: "Vicepresidente",
       nombre: "",
-      descripcion: "Apoyando el crecimiento institucional con visión de futuro.",
+      descripcion: "",
       icon: Shield,
     },
     {
       cargo: "Secretario General",
       nombre: "",
-      descripcion: "Gestionando la administración con eficiencia y transparencia.",
+      descripcion: "",
       icon: Flag,
     },
     {
       cargo: "Tesorero",
       nombre: "",
-      descripcion: "Administrando los recursos con honestidad y transparencia.",
+      descripcion: "",
       icon: Award,
     },
     {
       cargo: "Vocal",
       nombre: "",
-      descripcion: "Representando la voz de los clubes afiliados.",
+      descripcion: "",
       icon: Handshake,
     },
   ];
@@ -328,7 +328,7 @@ export default function OrganizacionPage() {
                         <h3 className="font-bold text-gray-800">{autoridad.nombre}</h3>
                       </div>
                     </div>
-                    <p className="text-gray-600 text-sm">{autoridad.descripcion}</p>
+                    {autoridad.descripcion && <p className="text-gray-600 text-sm">{autoridad.descripcion}</p>}
                   </CardContent>
                 </Card>
               );
