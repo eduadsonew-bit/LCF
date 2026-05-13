@@ -141,37 +141,37 @@ export default function OrganizacionPage() {
   const autoridades = [
     {
       cargo: "Presidente",
-      nombre: "Juan Carlos Rodríguez",
+      nombre: "",
       descripcion: "Liderando la liga con pasión y dedicación desde 2018.",
       icon: Award,
     },
     {
       cargo: "Vicepresidente",
-      nombre: "María Fernanda López",
+      nombre: "",
       descripcion: "Apoyando el crecimiento institucional con visión de futuro.",
       icon: Shield,
     },
     {
       cargo: "Secretario General",
-      nombre: "Carlos Alberto Martínez",
+      nombre: "",
       descripcion: "Gestionando la administración con eficiencia y transparencia.",
       icon: Flag,
     },
     {
       cargo: "Tesorero",
-      nombre: "Andrés Felipe Gómez",
+      nombre: "",
       descripcion: "Administrando los recursos con honestidad y transparencia.",
       icon: Award,
     },
     {
       cargo: "Director Técnico",
-      nombre: "Roberto Carlos Herrera",
+      nombre: "",
       descripcion: "Supervisando el aspecto deportivo y técnico de la liga.",
       icon: Trophy,
     },
     {
       cargo: "Director de Comunicaciones",
-      nombre: "Laura Patricia Sánchez",
+      nombre: "",
       descripcion: "Conectando la liga con la comunidad y medios.",
       icon: Flag,
     },
