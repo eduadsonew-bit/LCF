@@ -379,10 +379,10 @@ export default function AdminPage() {
     setSelectedType(type);
 
     const defaults: Record<string, Record<string, unknown>> = {
-      tournament: { status: 'active', category: 'Adulto' },
+      tournament: { status: 'active', category: 'Adulto', order: 0 },
       match: { status: 'scheduled', homeTeam: '', awayTeam: '' },
-      news: { published: false, featured: false },
-      event: { eventType: 'partido' },
+      news: { published: false, featured: false, order: 0 },
+      event: { eventType: 'partido', order: 0 },
       sponsor: { tier: 'bronze', active: true, order: 0 },
       carousel: { order: 0, active: true },
       infocard: { order: 0, active: true, color: 'green', icon: 'trophy' },
@@ -836,6 +836,11 @@ export default function AdminPage() {
               <Label>URL de Imagen</Label>
               <Input value={form.image as string || ''} onChange={(e) => handleChange('image', e.target.value)} placeholder="https://..." />
             </div>
+            <div className="space-y-2">
+              <Label>Orden de Visualización</Label>
+              <Input type="number" min={0} value={form.order as number ?? 0} onChange={(e) => handleChange('order', parseInt(e.target.value) || 0)} />
+              <p className="text-xs text-gray-500">Número menor = aparece primero</p>
+            </div>
           </>
         );
       case 'match':
@@ -940,6 +945,11 @@ export default function AdminPage() {
                 </Select>
               </div>
             </div>
+            <div className="space-y-2">
+              <Label>Orden de Visualización</Label>
+              <Input type="number" min={0} value={form.order as number ?? 0} onChange={(e) => handleChange('order', parseInt(e.target.value) || 0)} />
+              <p className="text-xs text-gray-500">Número menor = aparece primero</p>
+            </div>
           </>
         );
       case 'event':
@@ -977,6 +987,11 @@ export default function AdminPage() {
             <div className="space-y-2">
               <Label>URL de Imagen</Label>
               <Input value={form.image as string || ''} onChange={(e) => handleChange('image', e.target.value)} placeholder="https://..." />
+            </div>
+            <div className="space-y-2">
+              <Label>Orden de Visualización</Label>
+              <Input type="number" min={0} value={form.order as number ?? 0} onChange={(e) => handleChange('order', parseInt(e.target.value) || 0)} />
+              <p className="text-xs text-gray-500">Número menor = aparece primero</p>
             </div>
           </>
         );

@@ -7,9 +7,10 @@ export async function GET() {
       where: {
         published: true,
       },
-      orderBy: {
-        publishedAt: 'desc',
-      },
+      orderBy: [
+        { order: 'asc' },
+        { publishedAt: 'desc' },
+      ],
     });
     return NextResponse.json(news);
   } catch (error) {

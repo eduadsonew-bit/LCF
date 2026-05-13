@@ -7,9 +7,10 @@ export async function GET() {
       include: {
         matches: true,
       },
-      orderBy: {
-        createdAt: 'desc',
-      },
+      orderBy: [
+        { order: 'asc' },
+        { createdAt: 'desc' },
+      ],
     });
     return NextResponse.json(tournaments);
   } catch (error) {

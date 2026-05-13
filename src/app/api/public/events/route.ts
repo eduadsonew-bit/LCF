@@ -4,9 +4,10 @@ import { db } from '@/lib/db';
 export async function GET() {
   try {
     const events = await db.event.findMany({
-      orderBy: {
-        date: 'asc',
-      },
+      orderBy: [
+        { order: 'asc' },
+        { date: 'asc' },
+      ],
     });
     return NextResponse.json(events);
   } catch (error) {
