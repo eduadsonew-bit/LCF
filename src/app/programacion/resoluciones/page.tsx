@@ -294,7 +294,7 @@ export default function ResolucionesPage() {
       {/* Footer */}
       <footer className="bg-green-900 text-white py-4 mt-auto">
         <div className="container mx-auto px-4 text-center">
-          <p className="text-green-200">Liga Caldense de Fútbol &copy; 2025</p>
+          <p className="text-green-200">Liga Caldense de Fútbol &copy; 2026</p>
         </div>
       </footer>
     </div>
