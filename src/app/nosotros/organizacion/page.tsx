@@ -278,22 +278,24 @@ export default function OrganizacionPage() {
         {/* Estructura Organizativa */}
         <section className="mb-12">
           <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold text-gray-800">Estructura Organizativa</h2>
+            <h2 className="text-2xl font-bold text-gray-800">Estructura Administrativa</h2>
             <p className="text-gray-600">Cómo estamos organizados</p>
           </div>
 
           <Card className="shadow-lg">
             <CardContent className="p-6">
-              <div className="grid md:grid-cols-3 gap-6">
+              <div className="grid md:grid-cols-4 gap-6">
                 <div className="text-center p-6 bg-green-50 rounded-xl">
-                  <Goal className="h-10 w-10 text-green-600 mx-auto mb-4" />
-                  <h3 className="font-bold text-gray-800 mb-2">Asamblea General</h3>
-                  <p className="text-gray-600 text-sm">Máximo órgano de gobierno</p>
+                  <Target className="h-10 w-10 text-green-600 mx-auto mb-4" />
+                  <h3 className="font-bold text-gray-800 mb-2">Órgano de Dirección</h3>
                 </div>
                 <div className="text-center p-6 bg-amber-50 rounded-xl">
                   <Shield className="h-10 w-10 text-amber-600 mx-auto mb-4" />
-                  <h3 className="font-bold text-gray-800 mb-2">Junta Directiva</h3>
-                  <p className="text-gray-600 text-sm">Órgano de administración</p>
+                  <h3 className="font-bold text-gray-800 mb-2">Órgano de Control</h3>
+                </div>
+                <div className="text-center p-6 bg-blue-50 rounded-xl">
+                  <Scale className="h-10 w-10 text-blue-600 mx-auto mb-4" />
+                  <h3 className="font-bold text-gray-800 mb-2">Órgano de Disciplina</h3>
                 </div>
                 <ComisionesCard />
               </div>
