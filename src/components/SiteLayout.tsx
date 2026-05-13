@@ -325,7 +325,7 @@ export default function SiteLayout({ children, showNavigation = true }: SiteLayo
               <h4 className="font-semibold mb-4">Ubicación</h4>
               <div className="flex items-center justify-center lg:justify-start text-green-200 text-sm">
                 <MapPin className="h-4 w-4 mr-2 flex-shrink-0" />
-                <span>Caldas, Antioquia, Colombia</span>
+                <span>Manizales, Caldas, Colombia</span>
               </div>
             </div>
 
