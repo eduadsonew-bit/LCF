@@ -8,7 +8,7 @@ export async function GET() {
         matches: true,
       },
       orderBy: [
-        { order: 'desc' },
+        { order: 'asc' },
         { createdAt: 'desc' },
       ],
     });
