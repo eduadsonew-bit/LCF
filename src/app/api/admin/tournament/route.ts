@@ -13,6 +13,7 @@ export async function POST(request: NextRequest) {
         status: data.status || 'active',
         category: data.category,
         image: data.image,
+        order: data.order || 1,
       },
     });
     return NextResponse.json(tournament);

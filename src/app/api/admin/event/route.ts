@@ -12,6 +12,7 @@ export async function POST(request: NextRequest) {
         location: data.location,
         image: data.image,
         eventType: data.eventType,
+        order: data.order || 1,
       },
     });
     return NextResponse.json(event);

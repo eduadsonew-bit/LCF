@@ -17,6 +17,7 @@ export async function PUT(
         location: data.location,
         image: data.image,
         eventType: data.eventType,
+        order: data.order != null && data.order >= 1 ? data.order : undefined,
       },
     });
     return NextResponse.json(event);

@@ -19,6 +19,7 @@ export async function PUT(
         published: data.published,
         featured: data.featured,
         publishedAt: data.published ? new Date() : null,
+        order: data.order != null && data.order >= 1 ? data.order : undefined,
       },
     });
     return NextResponse.json(news);

@@ -18,6 +18,7 @@ export async function PUT(
         status: data.status,
         category: data.category,
         image: data.image,
+        order: data.order != null && data.order >= 1 ? data.order : undefined,
       },
     });
     return NextResponse.json(tournament);

@@ -27,6 +27,7 @@ export async function POST(request: NextRequest) {
         published: data.published || false,
         featured: data.featured || false,
         publishedAt: data.published ? new Date() : null,
+        order: data.order || 1,
       },
     });
     return NextResponse.json(news);
