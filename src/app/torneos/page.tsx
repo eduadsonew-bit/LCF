@@ -4,11 +4,9 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Trophy,
-  Filter,
   ImageIcon,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Breadcrumb,
@@ -18,13 +16,6 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import SiteLayout from "@/components/SiteLayout";
 
 interface Tournament {
@@ -37,7 +28,6 @@ interface Tournament {
 export default function TorneosPage() {
   const [tournaments, setTournaments] = useState<Tournament[]>([]);
   const [loading, setLoading] = useState(true);
-  const [statusFilter, setStatusFilter] = useState<string>("all");
 
   useEffect(() => {
     const fetchTournaments = async () => {
@@ -54,37 +44,12 @@ export default function TorneosPage() {
     fetchTournaments();
   }, []);
 
-  // Filtrar torneos por estado e imagen
+  // Filtrar torneos con imagen
   const filteredTournaments = tournaments.filter(tournament => {
-    return tournament.image && (statusFilter === "all" || tournament.status === statusFilter);
+    return tournament.image;
   });
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'active':
-        return (
-          <Badge className="bg-green-500 text-white border-0">
-            Activo
-          </Badge>
-        );
-      case 'upcoming':
-        return (
-          <Badge className="bg-blue-500 text-white border-0">
-            Próximo
-          </Badge>
-        );
-      case 'finished':
-        return (
-          <Badge className="bg-gray-400 text-white border-0">
-            Finalizado
-          </Badge>
-        );
-      default:
-        return (
-          <Badge variant="secondary">{status}</Badge>
-        );
-    }
-  };
+
 
   return (
     <SiteLayout showNavigation={false}>
@@ -120,33 +85,6 @@ export default function TorneosPage() {
 
       {/* Contenido principal */}
       <div className="container mx-auto px-4 py-8">
-        {/* Filtro */}
-        <div className="bg-white rounded-xl shadow-md p-4 mb-6 flex items-center gap-4">
-          <Filter className="h-5 w-5 text-green-600" />
-          <span className="font-medium text-gray-700">Filtrar por estado:</span>
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-48">
-              <SelectValue placeholder="Todos los estados" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todos</SelectItem>
-              <SelectItem value="active">Activos</SelectItem>
-              <SelectItem value="upcoming">Próximos</SelectItem>
-              <SelectItem value="finished">Finalizados</SelectItem>
-            </SelectContent>
-          </Select>
-          {statusFilter !== "all" && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setStatusFilter("all")}
-              className="text-green-600 hover:text-green-700 hover:bg-green-50"
-            >
-              Limpiar filtro
-            </Button>
-          )}
-        </div>
-
         {loading ? (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {[...Array(8)].map((_, i) => (
@@ -181,10 +119,7 @@ export default function TorneosPage() {
                     )}
                   </div>
                   
-                  {/* Estado debajo de la imagen */}
-                  <div className="p-3 bg-white border-t flex justify-center">
-                    {getStatusBadge(tournament.status)}
-                  </div>
+
                 </CardContent>
               </Card>
             ))}
@@ -196,19 +131,8 @@ export default function TorneosPage() {
             </div>
             <h3 className="text-2xl font-semibold text-gray-700 mb-2">No hay torneos disponibles</h3>
             <p className="text-gray-500 mb-4">
-              {statusFilter !== "all"
-                ? "No se encontraron torneos con el filtro seleccionado."
-                : "Pronto publicaremos nuevos torneos."}
+              Pronto publicaremos nuevos torneos.
             </p>
-            {statusFilter !== "all" && (
-              <Button
-                variant="outline"
-                className="border-green-600 text-green-700 hover:bg-green-50"
-                onClick={() => setStatusFilter("all")}
-              >
-                Limpiar filtro
-              </Button>
-            )}
           </div>
         )}
 
