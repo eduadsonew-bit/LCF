@@ -8,7 +8,7 @@ export async function GET() {
         published: true,
       },
       orderBy: [
-        { order: 'asc' },
+        { order: 'desc' },
         { publishedAt: 'desc' },
       ],
     });

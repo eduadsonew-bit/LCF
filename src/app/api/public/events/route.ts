@@ -5,7 +5,7 @@ export async function GET() {
   try {
     const events = await db.event.findMany({
       orderBy: [
-        { order: 'asc' },
+        { order: 'desc' },
         { date: 'asc' },
       ],
     });
