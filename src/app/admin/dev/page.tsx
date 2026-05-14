@@ -403,10 +403,10 @@ export default function DevAdminPage() {
   const openAddDialog = (type: string) => {
     setSelectedType(type);
     const defaults: Record<string, Record<string, unknown>> = {
-      tournament: { status: 'active', category: 'Adulto', order: 0 },
+      tournament: { status: 'active', category: 'Adulto', order: 1 },
       match: { status: 'scheduled', homeTeam: '', awayTeam: '' },
-      news: { published: false, featured: false, order: 0 },
-      event: { eventType: 'partido', order: 0 },
+      news: { published: false, featured: false, order: 1 },
+      event: { eventType: 'partido', order: 1 },
       sponsor: { tier: 'bronze', active: true, order: 0 },
       carousel: { order: 0, active: true },
       infocard: { order: 0, active: true, color: 'green', icon: 'trophy' },
@@ -895,7 +895,7 @@ export default function DevAdminPage() {
             </div>
             <div className="space-y-2">
               <Label>Orden de Visualización</Label>
-              <Input type="number" value={form.order as number ?? 0} onChange={(e) => handleChange('order', parseInt(e.target.value) || 0)} />
+              <Input type="number" min={1} value={form.order as number >= 1 ? form.order as number : 1} onChange={(e) => handleChange('order', parseInt(e.target.value) >= 1 ? parseInt(e.target.value) : 1)} />
             </div>
           </>
         );
@@ -1003,7 +1003,7 @@ export default function DevAdminPage() {
             </div>
             <div className="space-y-2">
               <Label>Orden de Visualización</Label>
-              <Input type="number" value={form.order as number ?? 0} onChange={(e) => handleChange('order', parseInt(e.target.value) || 0)} />
+              <Input type="number" min={1} value={form.order as number >= 1 ? form.order as number : 1} onChange={(e) => handleChange('order', parseInt(e.target.value) >= 1 ? parseInt(e.target.value) : 1)} />
             </div>
           </>
         );
@@ -1045,7 +1045,7 @@ export default function DevAdminPage() {
             </div>
             <div className="space-y-2">
               <Label>Orden de Visualización</Label>
-              <Input type="number" value={form.order as number ?? 0} onChange={(e) => handleChange('order', parseInt(e.target.value) || 0)} />
+              <Input type="number" min={1} value={form.order as number >= 1 ? form.order as number : 1} onChange={(e) => handleChange('order', parseInt(e.target.value) >= 1 ? parseInt(e.target.value) : 1)} />
             </div>
           </>
         );

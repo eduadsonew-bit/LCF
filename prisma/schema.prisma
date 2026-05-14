@@ -28,7 +28,7 @@ model Tournament {
   status      String   @default("active") // active, finished, upcoming
   category    String?  // infantil, juvenil, adulto, etc.
   image       String?
-  order       Int      @default(0)
+  order       Int      @default(1)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   matches     Match[]
@@ -61,7 +61,7 @@ model News {
   published   Boolean  @default(false)
   featured    Boolean  @default(false)
   publishedAt DateTime?
-  order       Int      @default(0)
+  order       Int      @default(1)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
@@ -75,7 +75,7 @@ model Event {
   location    String?
   image       String?
   eventType   String?  // partido, torneo, ceremonia, etc.
-  order       Int      @default(0)
+  order       Int      @default(1)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
