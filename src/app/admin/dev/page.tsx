@@ -60,6 +60,7 @@ interface Tournament {
   status: string;
   category: string | null;
   image: string | null;
+  order: number;
 }
 
 interface Match {
@@ -85,6 +86,7 @@ interface NewsItem {
   published: boolean;
   featured: boolean;
   publishedAt: string | null;
+  order: number;
 }
 
 interface Event {
@@ -95,6 +97,7 @@ interface Event {
   location: string | null;
   image: string | null;
   eventType: string | null;
+  order: number;
 }
 
 interface Sponsor {
@@ -400,10 +403,10 @@ export default function DevAdminPage() {
   const openAddDialog = (type: string) => {
     setSelectedType(type);
     const defaults: Record<string, Record<string, unknown>> = {
-      tournament: { status: 'active', category: 'Adulto' },
+      tournament: { status: 'active', category: 'Adulto', order: 0 },
       match: { status: 'scheduled', homeTeam: '', awayTeam: '' },
-      news: { published: false, featured: false },
-      event: { eventType: 'partido' },
+      news: { published: false, featured: false, order: 0 },
+      event: { eventType: 'partido', order: 0 },
       sponsor: { tier: 'bronze', active: true, order: 0 },
       carousel: { order: 0, active: true },
       infocard: { order: 0, active: true, color: 'green', icon: 'trophy' },
@@ -890,6 +893,10 @@ export default function DevAdminPage() {
               <Label>URL de Imagen</Label>
               <Input value={form.image as string || ''} onChange={(e) => handleChange('image', e.target.value)} placeholder="https://..." />
             </div>
+            <div className="space-y-2">
+              <Label>Orden de Visualización</Label>
+              <Input type="number" value={form.order as number ?? 0} onChange={(e) => handleChange('order', parseInt(e.target.value) || 0)} />
+            </div>
           </>
         );
       case 'match':
@@ -994,6 +1001,10 @@ export default function DevAdminPage() {
                 </Select>
               </div>
             </div>
+            <div className="space-y-2">
+              <Label>Orden de Visualización</Label>
+              <Input type="number" value={form.order as number ?? 0} onChange={(e) => handleChange('order', parseInt(e.target.value) || 0)} />
+            </div>
           </>
         );
       case 'event':
@@ -1031,6 +1042,10 @@ export default function DevAdminPage() {
             <div className="space-y-2">
               <Label>URL de Imagen</Label>
               <Input value={form.image as string || ''} onChange={(e) => handleChange('image', e.target.value)} placeholder="https://..." />
+            </div>
+            <div className="space-y-2">
+              <Label>Orden de Visualización</Label>
+              <Input type="number" value={form.order as number ?? 0} onChange={(e) => handleChange('order', parseInt(e.target.value) || 0)} />
             </div>
           </>
         );
@@ -1375,7 +1390,12 @@ export default function DevAdminPage() {
     switch (type) {
       case 'tournament': {
         const t = item as Tournament;
-        return getBasicCard(t.name, t.description || '', t.image, <Badge variant={t.status === 'active' ? 'default' : 'secondary'}>{t.status}</Badge>);
+        return getBasicCard(t.name, t.description || '', t.image,
+          <div className="flex gap-1">
+            <Badge variant={t.status === 'active' ? 'default' : 'secondary'}>{t.status}</Badge>
+            <Badge variant="outline" className="text-xs">Orden: {t.order}</Badge>
+          </div>
+        );
       }
       case 'match': {
         const m = item as Match;
@@ -1407,15 +1427,21 @@ export default function DevAdminPage() {
       case 'news': {
         const n = item as NewsItem;
         return getBasicCard(n.title, n.summary || '', n.image,
-          <div className="flex gap-1">
+          <div className="flex gap-1 flex-wrap">
             {n.published && <Badge className="bg-green-500 text-xs">Publicado</Badge>}
             {n.featured && <Badge className="bg-yellow-500 text-xs">Destacado</Badge>}
+            <Badge variant="outline" className="text-xs">Orden: {n.order}</Badge>
           </div>
         );
       }
       case 'event': {
         const e = item as Event;
-        return getBasicCard(e.title, `${e.location || ''} - ${e.description || ''}`, e.image, e.eventType ? <Badge variant="outline">{e.eventType}</Badge> : null);
+        return getBasicCard(e.title, `${e.location || ''} - ${e.description || ''}`, e.image,
+          <div className="flex gap-1 flex-wrap">
+            {e.eventType ? <Badge variant="outline">{e.eventType}</Badge> : null}
+            <Badge variant="outline" className="text-xs">Orden: {e.order}</Badge>
+          </div>
+        );
       }
       case 'sponsor': {
         const s = item as Sponsor;
