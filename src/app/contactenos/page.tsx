@@ -63,8 +63,8 @@ export default function ContactenosPage() {
     {
       icon: Clock,
       title: "Horario de Atención",
-      detail: "Lunes a Sábado",
-      sub: "8:00 AM - 6:00 PM",
+      detail: "Lunes a Viernes 8:00 am a 6:00 pm",
+      sub: "Sábado 9:00 am a 12:00 m",
       gradient: "from-purple-500 to-purple-600",
     },
   ];
