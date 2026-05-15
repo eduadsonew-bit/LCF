@@ -222,6 +222,38 @@ export default function ExcelViewerRaw({ fileData, fileName }: ExcelViewerProps)
                   return newData[48][colIdx];
                 });
               }
+
+              // Merge row 5 (index 4): center text, height of row 11
+              if (newData[4] && newData.length > 10) {
+                const row5Value = newData[4][0]?.value ?? '';
+                const row5Style = newData[4][0]?.style || {};
+                newData[4] = newData[4].map((_, colIdx) => {
+                  if (colIdx === 0) {
+                    return {
+                      value: row5Value,
+                      colSpan: totalCols,
+                      style: {
+                        ...row5Style,
+                        alignment: { horizontal: 'center', vertical: 'middle' },
+                      },
+                    };
+                  }
+                  return { value: null, isMergedSkip: true };
+                });
+
+                // Set row 5 height to row 11 height (index 10)
+                if (sheet.rowHeights && sheet.rowHeights[10]) {
+                  const newRowHeights = [...sheet.rowHeights];
+                  newRowHeights[4] = sheet.rowHeights[10];
+                  return {
+                    ...sheet,
+                    data: newData,
+                    columnWidths: newWidths,
+                    columnCount: newColCount,
+                    rowHeights: newRowHeights,
+                  };
+                }
+              }
             }
           }
 
@@ -230,6 +262,7 @@ export default function ExcelViewerRaw({ fileData, fileName }: ExcelViewerProps)
             data: newData,
             columnWidths: newWidths,
             columnCount: newColCount,
+            rowHeights: sheet.rowHeights,
           };
         });
 
