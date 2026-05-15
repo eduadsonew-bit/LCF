@@ -122,7 +122,7 @@ export default function ContactenosPage() {
                     {item.subHighlight ? (
                       <p className="text-xs mt-1">
                         <span className="text-green-600 font-bold text-sm">Sábado</span>
-                        <span className="text-gray-500"> 9:00 am a 12:00 m</span>
+                        <span className="text-green-600 font-bold text-sm"> 9:00 am a 12:00 m</span>
                       </p>
                     ) : (
                       <p className="text-gray-500 text-xs mt-1">{item.sub}</p>
