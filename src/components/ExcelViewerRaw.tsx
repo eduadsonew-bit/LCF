@@ -131,10 +131,10 @@ export default function ExcelViewerRaw({ fileData, fileName }: ExcelViewerProps)
         // Detect if this is the 16,17,18 MAYO file to skip first sheet
         const is16_17_18Mayo = fileName.includes('16,17') || fileName.includes('16, 17') || fileName.includes('16, 17');
 
-        // For 16,17,18 MAYO file, skip the first sheet (hoja 1)
+        // For 16,17,18 MAYO file, keep hoja 0 and remove hoja 1
         let sheetsToProcess = parsedSheets;
         if (is16_17_18Mayo && parsedSheets.length > 1) {
-          sheetsToProcess = parsedSheets.slice(1);
+          sheetsToProcess = parsedSheets.filter((_, index) => index !== 1);
         }
 
         const processedSheets = sheetsToProcess.map(sheet => {
