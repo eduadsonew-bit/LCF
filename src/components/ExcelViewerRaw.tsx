@@ -224,8 +224,8 @@ export default function ExcelViewerRaw({ fileData, fileName }: ExcelViewerProps)
               }
 
               // Merge specified rows: center text, keep original style
-              // Rows: 8,11,19,24,29,34,36,41,50,53,60,65,72,78,80,84,95,100,107,112,117,122,127,133,138,144,150,154,163,165,171
-              const mergeRowNumbers = [8,11,19,24,29,34,36,41,50,53,60,65,72,78,80,84,95,100,107,112,117,122,127,133,138,144,150,154,163,165,171];
+              // Rows: 5,8,11,19,24,29,34,36,41,50,53,60,65,72,78,80,84,95,100,107,112,117,122,127,133,138,144,150,154,163,165,171
+              const mergeRowNumbers = [5,8,11,19,24,29,34,36,41,50,53,60,65,72,78,80,84,95,100,107,112,117,122,127,133,138,144,150,154,163,165,171];
               const mergeRowIndices = mergeRowNumbers.map(r => r - 1);
 
               let modifiedRowHeights = sheet.rowHeights ? [...sheet.rowHeights] : sheet.rowHeights;
