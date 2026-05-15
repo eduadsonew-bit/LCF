@@ -158,6 +158,31 @@ export default function ExcelViewerRaw({ fileData, fileName }: ExcelViewerProps)
               ? [...sheet.columnWidths.slice(0, 5), ...sheet.columnWidths.slice(7)]
               : sheet.columnWidths;
             newColCount = (sheet.columnCount || 0) - 2;
+
+            // Merge row 49 (index 48): keep first cell text, center it, yellow bold
+            if (newData.length >= 49) {
+              const rowIdx = 48; // row 49 = index 48
+              const row = newData[rowIdx];
+              if (row && row.length > 1) {
+                const firstCellValue = row[0]?.value ?? '';
+                const totalCols = row.length;
+                newData[rowIdx] = row.map((_, colIdx) => {
+                  if (colIdx === 0) {
+                    return {
+                      value: firstCellValue,
+                      colSpan: totalCols,
+                      style: {
+                        fill: '#FFFF00',
+                        font: { bold: true, color: '#000000' },
+                        alignment: { horizontal: 'center', vertical: 'middle' },
+                        border: { top: '1px solid #000', bottom: '1px solid #000', left: '1px solid #000', right: '1px solid #000' },
+                      },
+                    };
+                  }
+                  return { value: null, isMergedSkip: true };
+                });
+              }
+            }
           }
 
           return {
