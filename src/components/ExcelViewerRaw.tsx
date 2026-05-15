@@ -175,10 +175,9 @@ export default function ExcelViewerRaw({ fileData, fileName }: ExcelViewerProps)
               const totalCols = newData[0]?.length || 5;
               const mergeCols = Math.min(5, totalCols);
 
-              // Modify row 1 (index 0): merge columns A-E, green bg, yellow bold, centered, spanning 4 rows
+              // Modify row 1 (index 0): merge columns A-E, green bg, yellow bold, centered, single row
               const mergedCellStyle = {
                 value: firstCellValue,
-                rowSpan: 4,
                 colSpan: mergeCols,
                 style: {
                   fill: '#006400',
@@ -194,14 +193,6 @@ export default function ExcelViewerRaw({ fileData, fileName }: ExcelViewerProps)
                 if (colIdx < mergeCols) return { value: null, isMergedSkip: true };
                 return newData[0][colIdx];
               });
-              // Rows 2-4 (indices 1-3): merged skip for A-E
-              for (let r = 1; r <= 3; r++) {
-                newData[r] = newData[r].map((cell, colIdx) => {
-                  if (colIdx < mergeCols) return { value: null, isMergedSkip: true };
-                  return cell;
-                });
-              }
-
               // Copy row 1 style to row 49 (index 48) with custom title: "DOMINGO 17 DE MAYO"
               if (newData[48]) {
                 const row49Title = 'DOMINGO 17 DE MAYO';
