@@ -160,7 +160,7 @@ export default function ExcelViewerRaw({ fileData, fileName }: ExcelViewerProps)
 
             for (const rowIdx of mergeIndices) {
               if (newData[rowIdx] && newData[rowIdx].length > 1) {
-                const rowValue = rowIdx === 45
+                const rowValue = (rowIdx === 45 || rowIdx === 128)
                   ? (newData[0]?.[0]?.value ?? '')
                   : newData[rowIdx][0]?.value ?? '';
                 const rowStyle = newData[rowIdx][0]?.style || {};
