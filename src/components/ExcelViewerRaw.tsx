@@ -128,6 +128,9 @@ export default function ExcelViewerRaw({ fileData, fileName }: ExcelViewerProps)
         // Detect if this is the 9-10 MAYO file for special formatting
         const is9_10Mayo = fileName.includes('9-10') || fileName.includes('9,10');
 
+        // Detect if this is the 16,17,18 MAYO file
+        const is16_17_18Mayo = fileName.includes('16,17') || fileName.includes('16, 17');
+
         const processedSheets = parsedSheets.map(sheet => {
           let newData = sheet.data;
           let newWidths = sheet.columnWidths;
@@ -140,6 +143,15 @@ export default function ExcelViewerRaw({ fileData, fileName }: ExcelViewerProps)
               ? [...sheet.columnWidths.slice(0, 5), ...sheet.columnWidths.slice(6)]
               : sheet.columnWidths;
             newColCount = (sheet.columnCount || 0) - 1;
+          }
+
+          // Special formatting for 16,17,18 MAYO file: remove columns F and G (indexes 5 and 6)
+          if (is16_17_18Mayo) {
+            newData = sheet.data.map(row => [...row.slice(0, 5), ...row.slice(7)]);
+            newWidths = (sheet.columnWidths || []).length > 6
+              ? [...sheet.columnWidths.slice(0, 5), ...sheet.columnWidths.slice(7)]
+              : sheet.columnWidths;
+            newColCount = (sheet.columnCount || 0) - 2;
           }
 
           return {
