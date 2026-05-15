@@ -193,10 +193,17 @@ export default function ExcelViewerRaw({ fileData, fileName }: ExcelViewerProps)
                 if (colIdx < mergeCols) return { value: null, isMergedSkip: true };
                 return newData[0][colIdx];
               });
-              // Copy row 1 style to row 49 (index 48) with custom title: "DOMINGO 17 DE MAYO"
-              if (newData[48]) {
+
+              // Remove rows 2, 3, 4 (indices 1, 2, 3)
+              newData = [newData[0], ...newData.slice(4)];
+
+              // Remove corresponding row heights for rows 2, 3, 4
+              let modifiedRowHeights = sheet.rowHeights ? [sheet.rowHeights[0], ...sheet.rowHeights.slice(4)] : sheet.rowHeights;
+
+              // Copy row 1 style to row 49 (original index 48, now 45 after removing 3 rows) with custom title: "DOMINGO 17 DE MAYO"
+              if (newData[45]) {
                 const row49Title = 'DOMINGO 17 DE MAYO';
-                newData[48] = newData[48].map((_, colIdx) => {
+                newData[45] = newData[45].map((_, colIdx) => {
                   if (colIdx === 0) {
                     return {
                       value: row49Title,
@@ -210,16 +217,14 @@ export default function ExcelViewerRaw({ fileData, fileName }: ExcelViewerProps)
                     };
                   }
                   if (colIdx < mergeCols) return { value: null, isMergedSkip: true };
-                  return newData[48][colIdx];
+                  return newData[45][colIdx];
                 });
               }
 
               // Merge specified rows: center text, keep original style
+              // Original row numbers shifted by -3 after removing rows 2,3,4
               // Rows: 5,8,11,19,24,29,34,36,41,50,53,60,65,72,78,80,84,95,100,107,112,117,122,127,133,138,144,150,154,163,165,171
-              const mergeRowNumbers = [5,8,11,19,24,29,34,36,41,50,53,60,65,72,78,80,84,95,100,107,112,117,122,127,133,138,144,150,154,163,165,171];
-              const mergeRowIndices = mergeRowNumbers.map(r => r - 1);
-
-              let modifiedRowHeights = sheet.rowHeights ? [...sheet.rowHeights] : sheet.rowHeights;
+              const mergeRowIndices = [4,7,10,18,23,28,33,35,40,49,52,59,64,71,77,79,83,94,99,106,111,116,121,126,132,137,143,149,153,162,164,170];
 
               for (const rowIdx of mergeRowIndices) {
                 if (newData[rowIdx] && newData[rowIdx].length > 1) {
@@ -241,10 +246,9 @@ export default function ExcelViewerRaw({ fileData, fileName }: ExcelViewerProps)
                 }
               }
 
-              // Special: set row 5 (index 4) height to row 11 (index 10) height
-              if (modifiedRowHeights && modifiedRowHeights[10]) {
-                modifiedRowHeights = [...modifiedRowHeights];
-                modifiedRowHeights[4] = modifiedRowHeights[10];
+              // Special: set row 5 (index 4) height to row 11 (index 7 after shift) height
+              if (modifiedRowHeights && modifiedRowHeights[7]) {
+                modifiedRowHeights[4] = modifiedRowHeights[7];
               }
 
               return {
