@@ -200,6 +200,27 @@ export default function ExcelViewerRaw({ fileData, fileName }: ExcelViewerProps)
               // Remove corresponding row heights for rows 2, 3, 4
               let modifiedRowHeights = sheet.rowHeights ? [sheet.rowHeights[0], ...sheet.rowHeights.slice(4)] : sheet.rowHeights;
 
+              // Apply same green bg, yellow bold, centered style to row 2 (original row 5, index 1)
+              if (newData[1]) {
+                const row2Value = newData[1][0]?.value ?? '';
+                newData[1] = newData[1].map((_, colIdx) => {
+                  if (colIdx === 0) {
+                    return {
+                      value: row2Value,
+                      colSpan: mergeCols,
+                      style: {
+                        fill: '#006400',
+                        font: { bold: true, color: '#FFFF00', size: 48, name: row50Font },
+                        alignment: { horizontal: 'center', vertical: 'middle' },
+                        border: { top: '1px solid #000', bottom: '1px solid #000', left: '1px solid #000', right: '1px solid #000' },
+                      },
+                    };
+                  }
+                  if (colIdx < mergeCols) return { value: null, isMergedSkip: true };
+                  return newData[1][colIdx];
+                });
+              }
+
               // Copy row 1 style to row 49 (original index 48, now 45 after removing 3 rows) with custom title: "DOMINGO 17 DE MAYO"
               if (newData[45]) {
                 const row49Title = 'DOMINGO 17 DE MAYO';
