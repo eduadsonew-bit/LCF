@@ -56,7 +56,7 @@ export default function ContactenosPage() {
     {
       icon: MapPin,
       title: "Dirección",
-      detail: "Estadio Palogrande, puerta 22",
+      detail: "Estadio Palogrande, puerta 22 Norte",
       sub: "Manizales, Caldas",
       gradient: "from-blue-500 to-blue-600",
     },
