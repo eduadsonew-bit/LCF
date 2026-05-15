@@ -159,8 +159,10 @@ export default function ExcelViewerRaw({ fileData, fileName }: ExcelViewerProps)
               : sheet.columnWidths;
             newColCount = (sheet.columnCount || 0) - 2;
 
-            // Merge row 49 (index 48): keep first cell text, center it, yellow bold
-            if (newData.length >= 49) {
+            // Merge row 49 (index 48): keep first cell text, center it, green bg, yellow font, size 36
+            if (newData.length >= 50) {
+              // Get font family from row 50 (index 49)
+              const row50Font = newData[49]?.[0]?.style?.font?.name || 'Calibri';
               const rowIdx = 48; // row 49 = index 48
               const row = newData[rowIdx];
               if (row && row.length > 1) {
@@ -172,8 +174,8 @@ export default function ExcelViewerRaw({ fileData, fileName }: ExcelViewerProps)
                       value: firstCellValue,
                       colSpan: totalCols,
                       style: {
-                        fill: '#FFFF00',
-                        font: { bold: true, color: '#000000' },
+                        fill: '#006400',
+                        font: { bold: true, color: '#FFFF00', size: 48, name: row50Font },
                         alignment: { horizontal: 'center', vertical: 'middle' },
                         border: { top: '1px solid #000', bottom: '1px solid #000', left: '1px solid #000', right: '1px solid #000' },
                       },
