@@ -128,7 +128,16 @@ export default function ExcelViewerRaw({ fileData, fileName }: ExcelViewerProps)
         // Detect if this is the 9-10 MAYO file for special formatting
         const is9_10Mayo = fileName.includes('9-10') || fileName.includes('9,10');
 
-        const processedSheets = parsedSheets.map(sheet => {
+        // Detect if this is the 16,17,18 MAYO file to skip first sheet
+        const is16_17_18Mayo = fileName.includes('16,17') || fileName.includes('16, 17') || fileName.includes('16, 17');
+
+        // For 16,17,18 MAYO file, skip the first sheet (hoja 1)
+        let sheetsToProcess = parsedSheets;
+        if (is16_17_18Mayo && parsedSheets.length > 1) {
+          sheetsToProcess = parsedSheets.slice(1);
+        }
+
+        const processedSheets = sheetsToProcess.map(sheet => {
           let newData = sheet.data;
           let newWidths = sheet.columnWidths;
           let newColCount = sheet.columnCount;
