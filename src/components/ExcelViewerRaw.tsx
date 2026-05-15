@@ -142,14 +142,22 @@ export default function ExcelViewerRaw({ fileData, fileName }: ExcelViewerProps)
           let newWidths = sheet.columnWidths;
           let newColCount = sheet.columnCount;
 
-          // Special formatting only for 9-10 MAYO file
+          // Special formatting for 9-10 MAYO file: remove column F (index 5)
           if (is9_10Mayo) {
-            // Remove column F (index 5) from each row
             newData = sheet.data.map(row => [...row.slice(0, 5), ...row.slice(6)]);
             newWidths = (sheet.columnWidths || []).length > 5
               ? [...sheet.columnWidths.slice(0, 5), ...sheet.columnWidths.slice(6)]
               : sheet.columnWidths;
             newColCount = (sheet.columnCount || 0) - 1;
+          }
+
+          // Special formatting for 16,17,18 MAYO file: remove columns F and G (indexes 5 and 6)
+          if (is16_17_18Mayo) {
+            newData = sheet.data.map(row => [...row.slice(0, 5), ...row.slice(7)]);
+            newWidths = (sheet.columnWidths || []).length > 6
+              ? [...sheet.columnWidths.slice(0, 5), ...sheet.columnWidths.slice(7)]
+              : sheet.columnWidths;
+            newColCount = (sheet.columnCount || 0) - 2;
           }
 
           return {
