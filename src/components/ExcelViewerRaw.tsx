@@ -160,7 +160,9 @@ export default function ExcelViewerRaw({ fileData, fileName }: ExcelViewerProps)
 
             for (const rowIdx of mergeIndices) {
               if (newData[rowIdx] && newData[rowIdx].length > 1) {
-                const rowValue = rowIdx === 45
+                const rowValue = rowIdx === 0
+                  ? 'SÁBADO 16 DE MAYO'
+                  : rowIdx === 45
                   ? 'DOMINGO 17 DE MAYO'
                   : rowIdx === 128
                   ? 'LUNES 18 DE MAYO'
