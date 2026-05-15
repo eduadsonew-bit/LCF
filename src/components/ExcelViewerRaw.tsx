@@ -159,6 +159,16 @@ export default function ExcelViewerRaw({ fileData, fileName }: ExcelViewerProps)
               : sheet.columnWidths;
             newColCount = (sheet.columnCount || 0) - 2;
 
+            // Text replacement: change title from "DOMINGO 17 DE MAYO" to "SÁBADO 16 DE MAYO"
+            newData = newData.map(row =>
+              row.map(cell => {
+                if (cell.value && typeof cell.value === 'string' && cell.value.includes('DOMINGO 17 DE MAYO')) {
+                  return { ...cell, value: cell.value.replace('DOMINGO 17 DE MAYO', 'SÁBADO 16 DE MAYO') };
+                }
+                return cell;
+              })
+            );
+
             if (newData.length >= 50) {
               const row50Font = newData[49]?.[0]?.style?.font?.name || 'Calibri';
               const firstCellValue = newData[48]?.[0]?.value ?? '';
