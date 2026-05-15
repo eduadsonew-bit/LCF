@@ -65,6 +65,7 @@ export default function ContactenosPage() {
       title: "Horario de Atención",
       detail: "Lunes a Viernes 8:00 am a 6:00 pm",
       sub: "Sábado 9:00 am a 12:00 m",
+      subHighlight: true,
       gradient: "from-purple-500 to-purple-600",
     },
   ];
@@ -118,7 +119,14 @@ export default function ContactenosPage() {
                     </div>
                     <h3 className="text-lg font-bold text-gray-800 mb-2">{item.title}</h3>
                     <p className="text-green-700 font-semibold text-sm">{item.detail}</p>
-                    <p className="text-gray-500 text-xs mt-1">{item.sub}</p>
+                    {item.subHighlight ? (
+                      <p className="text-xs mt-1">
+                        <span className="text-green-600 font-bold text-sm">Sábado</span>
+                        <span className="text-gray-500"> 9:00 am a 12:00 m</span>
+                      </p>
+                    ) : (
+                      <p className="text-gray-500 text-xs mt-1">{item.sub}</p>
+                    )}
                   </CardContent>
                 </Card>
               );
