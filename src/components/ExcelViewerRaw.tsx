@@ -167,6 +167,7 @@ export default function ExcelViewerRaw({ fileData, fileName }: ExcelViewerProps)
                   ? {
                       ...rowStyle,
                       font: { ...(rowStyle.font || {}), color: '#FFFF00', bold: true },
+                      alignment: { horizontal: 'center', vertical: 'middle' },
                     }
                   : yellowFillRows.has(rowIdx)
                   ? {
