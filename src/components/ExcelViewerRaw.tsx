@@ -160,8 +160,10 @@ export default function ExcelViewerRaw({ fileData, fileName }: ExcelViewerProps)
 
             for (const rowIdx of mergeIndices) {
               if (newData[rowIdx] && newData[rowIdx].length > 1) {
-                const rowValue = (rowIdx === 45 || rowIdx === 128)
-                  ? (newData[0]?.[0]?.value ?? '')
+                const rowValue = rowIdx === 45
+                  ? 'DOMINGO 17 DE MAYO'
+                  : rowIdx === 128
+                  ? 'LUNES 18 DE MAYO'
                   : newData[rowIdx][0]?.value ?? '';
                 const rowStyle = newData[rowIdx][0]?.style || {};
                 const yellowFillRows = new Set([1,4,7,15,20,25,30,32,37,46,49,56,61,68,74,76,80,91,96,103,108,113,118,123,129,134,140,146,150,154,159,161,167]);
