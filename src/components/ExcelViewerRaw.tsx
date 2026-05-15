@@ -175,7 +175,7 @@ export default function ExcelViewerRaw({ fileData, fileName }: ExcelViewerProps)
                       style: {
                         fill: '#006400',
                         font: { bold: true, color: '#FFFF00', size: 48, name: row50Font },
-                        alignment: { horizontal: 'center', vertical: 'middle' },
+                        alignment: { horizontal: 'right', vertical: 'middle' },
                         border: { top: '1px solid #000', bottom: '1px solid #000', left: '1px solid #000', right: '1px solid #000' },
                       },
                     };
