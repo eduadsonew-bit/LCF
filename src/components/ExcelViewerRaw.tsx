@@ -166,7 +166,6 @@ export default function ExcelViewerRaw({ fileData, fileName }: ExcelViewerProps)
                   ? {
                       ...rowStyle,
                       font: { ...(rowStyle.font || {}), color: '#FFFF00', bold: true },
-                      alignment: { horizontal: 'center', vertical: 'middle' },
                     }
                   : rowStyle;
                 newData[rowIdx] = newData[rowIdx].map((_, colIdx) => {
