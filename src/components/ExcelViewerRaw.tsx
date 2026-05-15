@@ -153,21 +153,26 @@ export default function ExcelViewerRaw({ fileData, fileName }: ExcelViewerProps)
               : sheet.columnWidths;
             newColCount = (sheet.columnCount || 0) - 2;
 
-            // Merge all cells in row 1 (index 0), keep first cell text and style
-            if (newData[0] && newData[0].length > 1) {
-              const row1Value = newData[0][0]?.value ?? '';
-              const row1Style = newData[0][0]?.style || {};
-              const totalCols = newData[0].length;
-              newData[0] = newData[0].map((_, colIdx) => {
-                if (colIdx === 0) {
-                  return {
-                    value: row1Value,
-                    colSpan: totalCols,
-                    style: row1Style,
-                  };
-                }
-                return { value: null, isMergedSkip: true };
-              });
+            // Merge all cells in specified rows, keep first cell text and style
+            const mergeRows = [1,2,5,8,16,21,26,31,33,38,46,47,50,57,62,69,75,77,81,92,97,104,109,114,119,124,129,130,135,141,147,151,155,160,162,168];
+            const mergeIndices = mergeRows.map(r => r - 1);
+            const totalCols = newData[0]?.length || 1;
+
+            for (const rowIdx of mergeIndices) {
+              if (newData[rowIdx] && newData[rowIdx].length > 1) {
+                const rowValue = newData[rowIdx][0]?.value ?? '';
+                const rowStyle = newData[rowIdx][0]?.style || {};
+                newData[rowIdx] = newData[rowIdx].map((_, colIdx) => {
+                  if (colIdx === 0) {
+                    return {
+                      value: rowValue,
+                      colSpan: totalCols,
+                      style: rowStyle,
+                    };
+                  }
+                  return { value: null, isMergedSkip: true };
+                });
+              }
             }
           }
 
