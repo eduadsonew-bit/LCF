@@ -162,12 +162,18 @@ export default function ExcelViewerRaw({ fileData, fileName }: ExcelViewerProps)
               if (newData[rowIdx] && newData[rowIdx].length > 1) {
                 const rowValue = newData[rowIdx][0]?.value ?? '';
                 const rowStyle = newData[rowIdx][0]?.style || {};
+                const customStyle = rowIdx === 0
+                  ? {
+                      ...rowStyle,
+                      font: { ...(rowStyle.font || {}), color: '#FFFF00', bold: true },
+                    }
+                  : rowStyle;
                 newData[rowIdx] = newData[rowIdx].map((_, colIdx) => {
                   if (colIdx === 0) {
                     return {
                       value: rowValue,
                       colSpan: totalCols,
-                      style: rowStyle,
+                      style: customStyle,
                     };
                   }
                   return { value: null, isMergedSkip: true };
