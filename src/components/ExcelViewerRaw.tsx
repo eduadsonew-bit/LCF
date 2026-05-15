@@ -223,37 +223,46 @@ export default function ExcelViewerRaw({ fileData, fileName }: ExcelViewerProps)
                 });
               }
 
-              // Merge row 5 (index 4): center text, height of row 11
-              if (newData[4] && newData.length > 10) {
-                const row5Value = newData[4][0]?.value ?? '';
-                const row5Style = newData[4][0]?.style || {};
-                newData[4] = newData[4].map((_, colIdx) => {
-                  if (colIdx === 0) {
-                    return {
-                      value: row5Value,
-                      colSpan: totalCols,
-                      style: {
-                        ...row5Style,
-                        alignment: { horizontal: 'center', vertical: 'middle' },
-                      },
-                    };
-                  }
-                  return { value: null, isMergedSkip: true };
-                });
+              // Merge specified rows: center text, keep original style
+              // Rows: 8,11,19,24,29,34,36,41,50,53,60,65,72,78,80,84,95,100,107,112,117,122,127,133,138,144,150,154,163,165,171
+              const mergeRowNumbers = [8,11,19,24,29,34,36,41,50,53,60,65,72,78,80,84,95,100,107,112,117,122,127,133,138,144,150,154,163,165,171];
+              const mergeRowIndices = mergeRowNumbers.map(r => r - 1);
 
-                // Set row 5 height to row 11 height (index 10)
-                if (sheet.rowHeights && sheet.rowHeights[10]) {
-                  const newRowHeights = [...sheet.rowHeights];
-                  newRowHeights[4] = sheet.rowHeights[10];
-                  return {
-                    ...sheet,
-                    data: newData,
-                    columnWidths: newWidths,
-                    columnCount: newColCount,
-                    rowHeights: newRowHeights,
-                  };
+              let modifiedRowHeights = sheet.rowHeights ? [...sheet.rowHeights] : sheet.rowHeights;
+
+              for (const rowIdx of mergeRowIndices) {
+                if (newData[rowIdx] && newData[rowIdx].length > 1) {
+                  const rowValue = newData[rowIdx][0]?.value ?? '';
+                  const rowStyle = newData[rowIdx][0]?.style || {};
+                  newData[rowIdx] = newData[rowIdx].map((_, colIdx) => {
+                    if (colIdx === 0) {
+                      return {
+                        value: rowValue,
+                        colSpan: totalCols,
+                        style: {
+                          ...rowStyle,
+                          alignment: { horizontal: 'center', vertical: 'middle' },
+                        },
+                      };
+                    }
+                    return { value: null, isMergedSkip: true };
+                  });
                 }
               }
+
+              // Special: set row 5 (index 4) height to row 11 (index 10) height
+              if (modifiedRowHeights && modifiedRowHeights[10]) {
+                modifiedRowHeights = [...modifiedRowHeights];
+                modifiedRowHeights[4] = modifiedRowHeights[10];
+              }
+
+              return {
+                ...sheet,
+                data: newData,
+                columnWidths: newWidths,
+                columnCount: newColCount,
+                rowHeights: modifiedRowHeights,
+              };
             }
           }
 
