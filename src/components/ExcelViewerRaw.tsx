@@ -159,34 +159,48 @@ export default function ExcelViewerRaw({ fileData, fileName }: ExcelViewerProps)
               : sheet.columnWidths;
             newColCount = (sheet.columnCount || 0) - 2;
 
-            // Merge row 49 (index 48): keep first cell text, center it in columns A-E, green bg, yellow font, size 36
             if (newData.length >= 50) {
               const row50Font = newData[49]?.[0]?.style?.font?.name || 'Calibri';
-              const rowIdx = 48; // row 49 = index 48
-              const row = newData[rowIdx];
-              if (row && row.length > 1) {
-                const firstCellValue = row[0]?.value ?? '';
-                const mergeCols = Math.min(5, row.length); // columns A to E = 5 columns
-                newData[rowIdx] = row.map((originalCell, colIdx) => {
-                  if (colIdx === 0) {
-                    return {
-                      value: firstCellValue,
-                      colSpan: mergeCols,
-                      style: {
-                        fill: '#006400',
-                        font: { bold: true, color: '#FFFF00', size: 48, name: row50Font },
-                        alignment: { horizontal: 'center', vertical: 'middle' },
-                        border: { top: '1px solid #000', bottom: '1px solid #000', left: '1px solid #000', right: '1px solid #000' },
-                      },
-                    };
-                  }
-                  if (colIdx < mergeCols) {
-                    return { value: null, isMergedSkip: true };
-                  }
-                  // Keep remaining columns (F onwards) as they are
-                  return originalCell;
-                });
-              }
+              const firstCellValue = newData[48]?.[0]?.value ?? '';
+              const totalCols = newData[0]?.length || 5;
+              const mergeCols = Math.min(5, totalCols);
+              const mergedCellStyle = {
+                value: firstCellValue,
+                rowSpan: 4,
+                colSpan: mergeCols,
+                style: {
+                  fill: '#006400',
+                  font: { bold: true, color: '#FFFF00', size: 48, name: row50Font },
+                  alignment: { horizontal: 'center', vertical: 'middle' },
+                  border: { top: '1px solid #000', bottom: '1px solid #000', left: '1px solid #000', right: '1px solid #000' },
+                },
+              };
+
+              // Remove rows 1-4 (indices 0-3) and row 49 (index 48)
+              const rowsWithout1to4 = newData.slice(4);
+              const rowsWithout49 = rowsWithout1to4.filter((_, idx) => idx !== 44); // 48 - 4 = 44
+
+              // Build header rows (rows 1-4 replaced by merged cell spanning 4 rows)
+              const headerRow1 = Array.from({ length: totalCols }, (_, colIdx) => {
+                if (colIdx === 0) return mergedCellStyle;
+                if (colIdx < mergeCols) return { value: null, isMergedSkip: true };
+                return { value: null, style: {} };
+              });
+              const headerRow2 = Array.from({ length: totalCols }, (_, colIdx) => {
+                if (colIdx < mergeCols) return { value: null, isMergedSkip: true };
+                return { value: null, style: {} };
+              });
+              const headerRow3 = Array.from({ length: totalCols }, (_, colIdx) => {
+                if (colIdx < mergeCols) return { value: null, isMergedSkip: true };
+                return { value: null, style: {} };
+              });
+              const headerRow4 = Array.from({ length: totalCols }, (_, colIdx) => {
+                if (colIdx < mergeCols) return { value: null, isMergedSkip: true };
+                return { value: null, style: {} };
+              });
+
+              newData = [headerRow1, headerRow2, headerRow3, headerRow4, ...rowsWithout49];
+              newColCount = totalCols;
             }
           }
 
