@@ -42,7 +42,7 @@ export default function ContactenosPage() {
     {
       icon: Phone,
       title: "Teléfono",
-      detail: "+57 (6) 123 4567",
+      detail: "3137891319",
       sub: "Lunes a Sábado, 8am - 6pm",
       gradient: "from-green-500 to-green-600",
     },
