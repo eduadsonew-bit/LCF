@@ -3,6 +3,7 @@
 import Link from "next/link";
 import {
   Phone,
+  Mail,
   MapPin,
   Clock,
   MessageSquare,
@@ -44,6 +45,13 @@ export default function ContactenosPage() {
       detail: "3137891319",
       sub: "",
       gradient: "from-green-500 to-green-600",
+    },
+    {
+      icon: Mail,
+      title: "Correo Electrónico",
+      detail: "",
+      sub: "",
+      gradient: "from-[#fbbf24] to-amber-500",
     },
     {
       icon: MapPin,
