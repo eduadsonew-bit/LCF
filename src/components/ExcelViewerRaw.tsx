@@ -162,7 +162,7 @@ export default function ExcelViewerRaw({ fileData, fileName }: ExcelViewerProps)
               if (newData[rowIdx] && newData[rowIdx].length > 1) {
                 const rowValue = newData[rowIdx][0]?.value ?? '';
                 const rowStyle = newData[rowIdx][0]?.style || {};
-                const customStyle = rowIdx === 0
+                const customStyle = (rowIdx === 0 || rowIdx === 45 || rowIdx === 128)
                   ? {
                       ...rowStyle,
                       font: { ...(rowStyle.font || {}), color: '#FFFF00', bold: true },
