@@ -167,7 +167,7 @@ export default function ExcelViewerRaw({ fileData, fileName }: ExcelViewerProps)
                   ? {
                       ...rowStyle,
                       font: { ...(rowStyle.font || {}), color: '#FFFF00', bold: true },
-                      alignment: { horizontal: 'right', vertical: 'middle' },
+                      alignment: { horizontal: 'left', vertical: 'middle', indent: 10 },
                     }
                   : (rowIdx === 0 || rowIdx === 128)
                   ? {
