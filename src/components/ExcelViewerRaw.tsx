@@ -125,42 +125,29 @@ export default function ExcelViewerRaw({ fileData, fileName }: ExcelViewerProps)
         const data = await response.json();
         const parsedSheets: SheetData[] = data.sheets || [];
 
-        // Merge cells A to E (index 0 to 4) in specified rows and center text
-        // Rows are 1-based from Excel, convert to 0-based array index
-        const mergeRows = [1, 2, 8, 13, 20, 26, 29, 36, 43, 45, 48, 51, 69, 70, 73, 76, 79, 82, 86, 90, 94].map(r => r - 1);
-        const processedSheets = parsedSheets.map(sheet => {
-          // Remove column F (index 5) from each row
-          const newData = sheet.data.map(row => [...row.slice(0, 5), ...row.slice(6)]);
-          const newWidths = (sheet.columnWidths || []).length > 5
-            ? [...sheet.columnWidths.slice(0, 5), ...sheet.columnWidths.slice(6)]
-            : sheet.columnWidths;
+        // Detect if this is the 9-10 MAYO file for special formatting
+        const is9_10Mayo = fileName.includes('9-10') || fileName.includes('9,10');
 
-          for (const rowIdx of mergeRows) {
-            if (newData.length > rowIdx && newData[rowIdx].length >= 5) {
-              // Mark cells B-E (index 1-4) as merged skip
-              for (let c = 1; c <= 4 && c < newData[rowIdx].length; c++) {
-                newData[rowIdx][c] = { ...newData[rowIdx][c], isMergedSkip: true };
-              }
-              // Apply colSpan=5 (A to E) and center alignment to master cell A
-              newData[rowIdx][0] = {
-                ...newData[rowIdx][0],
-                colSpan: 5,
-                style: {
-                  ...newData[rowIdx][0].style,
-                  alignment: {
-                    ...newData[rowIdx][0].style?.alignment,
-                    horizontal: 'center',
-                    vertical: 'middle',
-                  },
-                },
-              };
-            }
+        const processedSheets = parsedSheets.map(sheet => {
+          let newData = sheet.data;
+          let newWidths = sheet.columnWidths;
+          let newColCount = sheet.columnCount;
+
+          // Special formatting only for 9-10 MAYO file
+          if (is9_10Mayo) {
+            // Remove column F (index 5) from each row
+            newData = sheet.data.map(row => [...row.slice(0, 5), ...row.slice(6)]);
+            newWidths = (sheet.columnWidths || []).length > 5
+              ? [...sheet.columnWidths.slice(0, 5), ...sheet.columnWidths.slice(6)]
+              : sheet.columnWidths;
+            newColCount = (sheet.columnCount || 0) - 1;
           }
+
           return {
             ...sheet,
             data: newData,
             columnWidths: newWidths,
-            columnCount: (sheet.columnCount || 0) - 1,
+            columnCount: newColCount,
           };
         });
 
@@ -173,7 +160,7 @@ export default function ExcelViewerRaw({ fileData, fileName }: ExcelViewerProps)
       }
     };
     loadExcel();
-  }, [fileData]);
+  }, [fileData, fileName]);
 
   if (loading) {
     return (
@@ -202,6 +189,11 @@ export default function ExcelViewerRaw({ fileData, fileName }: ExcelViewerProps)
       </div>
     );
   }
+
+  // Special formatting only for 9-10 MAYO file
+  const is9_10Mayo = fileName.includes('9-10') || fileName.includes('9,10');
+  const yellowRows = is9_10Mayo ? new Set([2, 8, 13, 20, 26, 29, 36, 43, 45, 48, 51, 70, 73, 76, 79, 82, 86, 90, 94].map(r => r - 1)) : null;
+  const yellowFontRows = is9_10Mayo ? new Set([0, 68]) : null;
 
   const handlePrevSheet = () => { if (activeSheet > 0) setActiveSheet(activeSheet - 1); };
   const handleNextSheet = () => { if (activeSheet < sheets.length - 1) setActiveSheet(activeSheet + 1); };
@@ -308,12 +300,8 @@ export default function ExcelViewerRaw({ fileData, fileName }: ExcelViewerProps)
               const isFirstRow = rowIndex === 0;
               const isLastRow = rowIndex === currentSheet.data.length - 1;
               const totalCols = row.length;
-              // Yellow fill for specific rows (0-based: subtract 1 from Excel row numbers)
-              const yellowRows = new Set([2, 8, 13, 20, 26, 29, 36, 43, 45, 48, 51, 70, 73, 76, 79, 82, 86, 90, 94].map(r => r - 1));
-              const isYellowRow = yellowRows.has(rowIndex);
-              // Yellow font for title rows 1 and 69 (0-based: 0 and 68)
-              const yellowFontRows = new Set([0, 68]);
-              const isYellowFontRow = yellowFontRows.has(rowIndex);
+              const isYellowRow = yellowRows?.has(rowIndex) || false;
+              const isYellowFontRow = yellowFontRows?.has(rowIndex) || false;
               return (
                 <tr key={rowIndex} style={rowHeight > 0 ? { height: rowHeight + 'px' } : undefined}>
                   <td
@@ -345,8 +333,8 @@ export default function ExcelViewerRaw({ fileData, fileName }: ExcelViewerProps)
                       style.fontSize = '20pt';
                       style.fontWeight = 'bold';
                     }
-                    // Font size 16pt for all other cells
-                    if (!isYellowFontRow) {
+                    // Font size 16pt for all cells in 9-10 MAYO file
+                    if (is9_10Mayo && !isYellowFontRow) {
                       style.fontSize = '16pt';
                     }
 
