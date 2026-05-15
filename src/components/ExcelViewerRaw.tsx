@@ -152,6 +152,23 @@ export default function ExcelViewerRaw({ fileData, fileName }: ExcelViewerProps)
               ? [...sheet.columnWidths.slice(0, 5), ...sheet.columnWidths.slice(7)]
               : sheet.columnWidths;
             newColCount = (sheet.columnCount || 0) - 2;
+
+            // Merge all cells in row 1 (index 0), keep first cell text and style
+            if (newData[0] && newData[0].length > 1) {
+              const row1Value = newData[0][0]?.value ?? '';
+              const row1Style = newData[0][0]?.style || {};
+              const totalCols = newData[0].length;
+              newData[0] = newData[0].map((_, colIdx) => {
+                if (colIdx === 0) {
+                  return {
+                    value: row1Value,
+                    colSpan: totalCols,
+                    style: row1Style,
+                  };
+                }
+                return { value: null, isMergedSkip: true };
+              });
+            }
           }
 
           return {
