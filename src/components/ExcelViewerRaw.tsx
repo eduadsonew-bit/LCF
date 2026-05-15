@@ -200,27 +200,6 @@ export default function ExcelViewerRaw({ fileData, fileName }: ExcelViewerProps)
               // Remove corresponding row heights for rows 2, 3, 4
               let modifiedRowHeights = sheet.rowHeights ? [sheet.rowHeights[0], ...sheet.rowHeights.slice(4)] : sheet.rowHeights;
 
-              // Apply same green bg, yellow bold, centered style to row 2 (original row 5, index 1)
-              if (newData[1]) {
-                const row2Value = newData[1][0]?.value ?? '';
-                newData[1] = newData[1].map((_, colIdx) => {
-                  if (colIdx === 0) {
-                    return {
-                      value: row2Value,
-                      colSpan: mergeCols,
-                      style: {
-                        fill: '#006400',
-                        font: { bold: true, color: '#FFFF00', size: 48, name: row50Font },
-                        alignment: { horizontal: 'center', vertical: 'middle' },
-                        border: { top: '1px solid #000', bottom: '1px solid #000', left: '1px solid #000', right: '1px solid #000' },
-                      },
-                    };
-                  }
-                  if (colIdx < mergeCols) return { value: null, isMergedSkip: true };
-                  return newData[1][colIdx];
-                });
-              }
-
               // Copy row 1 style to row 49 (original index 48, now 45 after removing 3 rows) with custom title: "DOMINGO 17 DE MAYO"
               if (newData[45]) {
                 const row49Title = 'DOMINGO 17 DE MAYO';
@@ -245,7 +224,7 @@ export default function ExcelViewerRaw({ fileData, fileName }: ExcelViewerProps)
               // Merge specified rows: center text, keep original style
               // Original row numbers shifted by -3 after removing rows 2,3,4
               // Rows: 5,8,11,19,24,29,34,36,41,50,53,60,65,72,78,80,84,95,100,107,112,117,122,127,133,138,144,150,154,163,165,171
-              const mergeRowIndices = [4,7,10,18,23,28,33,35,40,49,52,59,64,71,77,79,83,94,99,106,111,116,121,126,132,137,143,149,153,162,164,170];
+              const mergeRowIndices = [1,4,7,10,18,23,28,33,35,40,49,52,59,64,71,77,79,83,94,99,106,111,116,121,126,132,137,143,149,153,162,164,170];
 
               for (const rowIdx of mergeRowIndices) {
                 if (newData[rowIdx] && newData[rowIdx].length > 1) {
