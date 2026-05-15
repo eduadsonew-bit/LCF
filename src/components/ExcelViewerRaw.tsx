@@ -164,6 +164,8 @@ export default function ExcelViewerRaw({ fileData, fileName }: ExcelViewerProps)
               const firstCellValue = newData[48]?.[0]?.value ?? '';
               const totalCols = newData[0]?.length || 5;
               const mergeCols = Math.min(5, totalCols);
+
+              // Modify row 1 (index 0): merge columns A-E, green bg, yellow bold, centered, spanning 4 rows
               const mergedCellStyle = {
                 value: firstCellValue,
                 rowSpan: 4,
@@ -176,31 +178,39 @@ export default function ExcelViewerRaw({ fileData, fileName }: ExcelViewerProps)
                 },
               };
 
-              // Remove rows 1-4 (indices 0-3) and row 49 (index 48)
-              const rowsWithout1to4 = newData.slice(4);
-              const rowsWithout49 = rowsWithout1to4.filter((_, idx) => idx !== 44); // 48 - 4 = 44
-
-              // Build header rows (rows 1-4 replaced by merged cell spanning 4 rows)
-              const headerRow1 = Array.from({ length: totalCols }, (_, colIdx) => {
+              // Row 1 (index 0): master cell
+              newData[0] = Array.from({ length: totalCols }, (_, colIdx) => {
                 if (colIdx === 0) return mergedCellStyle;
                 if (colIdx < mergeCols) return { value: null, isMergedSkip: true };
-                return { value: null, style: {} };
+                return newData[0][colIdx];
               });
-              const headerRow2 = Array.from({ length: totalCols }, (_, colIdx) => {
-                if (colIdx < mergeCols) return { value: null, isMergedSkip: true };
-                return { value: null, style: {} };
-              });
-              const headerRow3 = Array.from({ length: totalCols }, (_, colIdx) => {
-                if (colIdx < mergeCols) return { value: null, isMergedSkip: true };
-                return { value: null, style: {} };
-              });
-              const headerRow4 = Array.from({ length: totalCols }, (_, colIdx) => {
-                if (colIdx < mergeCols) return { value: null, isMergedSkip: true };
-                return { value: null, style: {} };
-              });
+              // Rows 2-4 (indices 1-3): merged skip for A-E
+              for (let r = 1; r <= 3; r++) {
+                newData[r] = newData[r].map((cell, colIdx) => {
+                  if (colIdx < mergeCols) return { value: null, isMergedSkip: true };
+                  return cell;
+                });
+              }
 
-              newData = [headerRow1, headerRow2, headerRow3, headerRow4, ...rowsWithout49];
-              newColCount = totalCols;
+              // Copy row 1 style to row 49 (index 48): single row merge, same text and style
+              if (newData[48]) {
+                newData[48] = newData[48].map((_, colIdx) => {
+                  if (colIdx === 0) {
+                    return {
+                      value: firstCellValue,
+                      colSpan: mergeCols,
+                      style: {
+                        fill: '#006400',
+                        font: { bold: true, color: '#FFFF00', size: 48, name: row50Font },
+                        alignment: { horizontal: 'center', vertical: 'middle' },
+                        border: { top: '1px solid #000', bottom: '1px solid #000', left: '1px solid #000', right: '1px solid #000' },
+                      },
+                    };
+                  }
+                  if (colIdx < mergeCols) return { value: null, isMergedSkip: true };
+                  return newData[48][colIdx];
+                });
+              }
             }
           }
 
