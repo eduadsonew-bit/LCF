@@ -202,12 +202,13 @@ export default function ExcelViewerRaw({ fileData, fileName }: ExcelViewerProps)
                 });
               }
 
-              // Copy row 1 style to row 49 (index 48): single row merge, same text and style
+              // Copy row 1 style to row 49 (index 48) with custom title: "DOMINGO 17 DE MAYO"
               if (newData[48]) {
+                const row49Title = 'DOMINGO 17 DE MAYO';
                 newData[48] = newData[48].map((_, colIdx) => {
                   if (colIdx === 0) {
                     return {
-                      value: firstCellValue,
+                      value: row49Title,
                       colSpan: mergeCols,
                       style: {
                         fill: '#006400',
