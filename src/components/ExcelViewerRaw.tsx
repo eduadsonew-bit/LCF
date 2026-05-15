@@ -162,12 +162,13 @@ export default function ExcelViewerRaw({ fileData, fileName }: ExcelViewerProps)
               if (newData[rowIdx] && newData[rowIdx].length > 1) {
                 const rowValue = newData[rowIdx][0]?.value ?? '';
                 const rowStyle = newData[rowIdx][0]?.style || {};
+                const yellowFillRows = new Set([1,4,7,15,20,25,30,32,37,46,49,56,61,68,74,76,80,91,96,103,108,113,118,123,129,134,140,146,150,154,159,161,167]);
                 const customStyle = (rowIdx === 0 || rowIdx === 45 || rowIdx === 128)
                   ? {
                       ...rowStyle,
                       font: { ...(rowStyle.font || {}), color: '#FFFF00', bold: true },
                     }
-                  : rowIdx === 1
+                  : yellowFillRows.has(rowIdx)
                   ? {
                       ...rowStyle,
                       fill: '#FFFF00',
