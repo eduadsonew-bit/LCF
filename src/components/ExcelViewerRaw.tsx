@@ -159,20 +159,19 @@ export default function ExcelViewerRaw({ fileData, fileName }: ExcelViewerProps)
               : sheet.columnWidths;
             newColCount = (sheet.columnCount || 0) - 2;
 
-            // Merge row 49 (index 48): keep first cell text, center it, green bg, yellow font, size 36
+            // Merge row 49 (index 48): keep first cell text, center it in columns A-E, green bg, yellow font, size 36
             if (newData.length >= 50) {
-              // Get font family from row 50 (index 49)
               const row50Font = newData[49]?.[0]?.style?.font?.name || 'Calibri';
               const rowIdx = 48; // row 49 = index 48
               const row = newData[rowIdx];
               if (row && row.length > 1) {
                 const firstCellValue = row[0]?.value ?? '';
-                const totalCols = row.length;
-                newData[rowIdx] = row.map((_, colIdx) => {
+                const mergeCols = Math.min(5, row.length); // columns A to E = 5 columns
+                newData[rowIdx] = row.map((originalCell, colIdx) => {
                   if (colIdx === 0) {
                     return {
                       value: firstCellValue,
-                      colSpan: totalCols,
+                      colSpan: mergeCols,
                       style: {
                         fill: '#006400',
                         font: { bold: true, color: '#FFFF00', size: 48, name: row50Font },
@@ -181,7 +180,11 @@ export default function ExcelViewerRaw({ fileData, fileName }: ExcelViewerProps)
                       },
                     };
                   }
-                  return { value: null, isMergedSkip: true };
+                  if (colIdx < mergeCols) {
+                    return { value: null, isMergedSkip: true };
+                  }
+                  // Keep remaining columns (F onwards) as they are
+                  return originalCell;
                 });
               }
             }
