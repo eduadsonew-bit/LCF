@@ -43,7 +43,7 @@ export default function ContactenosPage() {
       icon: Phone,
       title: "Teléfono",
       detail: "3137891319",
-      sub: "Lunes a Sábado, 8am - 6pm",
+      sub: "",
       gradient: "from-green-500 to-green-600",
     },
     {
