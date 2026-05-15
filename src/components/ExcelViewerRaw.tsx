@@ -177,7 +177,7 @@ export default function ExcelViewerRaw({ fileData, fileName }: ExcelViewerProps)
 
               // Modify row 1 (index 0): merge columns A-E, green bg, yellow bold, centered, single row
               const mergedCellStyle = {
-                value: firstCellValue,
+                value: 'SÁBADO 16 DE MAYO',
                 colSpan: mergeCols,
                 style: {
                   fill: '#006400',
