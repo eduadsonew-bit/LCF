@@ -70,7 +70,7 @@ export default function ContactenosPage() {
   ];
 
   return (
-    <SiteLayout>
+    <SiteLayout showNavigation={false}>
       {/* Header */}
       <div className="bg-gradient-to-r from-green-700 to-green-900 text-white py-16 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none" />
