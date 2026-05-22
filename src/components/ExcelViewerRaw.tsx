@@ -208,25 +208,29 @@ export default function ExcelViewerRaw({ fileData, fileName }: ExcelViewerProps)
           if (is23_24Mayo) {
             const totalCols = newData[0]?.length || 1;
             const mergeCols = Math.min(6, totalCols); // A to F = 6 columns
-            if (newData[0] && newData[0].length > 1) {
-              const rowStyle = newData[0][0]?.style || {};
-              const customStyle = {
-                ...rowStyle,
-                alignment: { horizontal: 'center', vertical: 'middle' },
-              };
-              newData[0] = newData[0].map((cell, colIdx) => {
-                if (colIdx === 0) {
-                  return {
-                    value: cell.value ?? '',
-                    colSpan: mergeCols,
-                    style: customStyle,
-                  };
-                }
-                if (colIdx < mergeCols) {
-                  return { value: null, isMergedSkip: true };
-                }
-                return cell;
-              });
+            const mergeRowIndices = [0, 57]; // rows 1 and 58 (0-indexed)
+
+            for (const rowIdx of mergeRowIndices) {
+              if (newData[rowIdx] && newData[rowIdx].length > 1) {
+                const rowStyle = newData[rowIdx][0]?.style || {};
+                const customStyle = {
+                  ...rowStyle,
+                  alignment: { horizontal: 'center', vertical: 'middle' },
+                };
+                newData[rowIdx] = newData[rowIdx].map((cell, colIdx) => {
+                  if (colIdx === 0) {
+                    return {
+                      value: cell.value ?? '',
+                      colSpan: mergeCols,
+                      style: customStyle,
+                    };
+                  }
+                  if (colIdx < mergeCols) {
+                    return { value: null, isMergedSkip: true };
+                  }
+                  return cell;
+                });
+              }
             }
           }
 
