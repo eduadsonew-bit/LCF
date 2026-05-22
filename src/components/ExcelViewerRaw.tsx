@@ -208,8 +208,8 @@ export default function ExcelViewerRaw({ fileData, fileName }: ExcelViewerProps)
           if (is23_24Mayo) {
             const totalCols = newData[0]?.length || 1;
             const mergeCols = Math.min(6, totalCols); // A to F = 6 columns
-            const mergeRowIndices = [0, 1, 57]; // rows 1, 2 and 58 (0-indexed)
-            const yellowFillRows = new Set([1]); // row 2 (0-indexed)
+            const mergeRowIndices = [0, 1, 3, 6, 13, 20, 26, 28, 51, 54, 57, 58, 61, 67, 74, 77, 83, 90, 102, 109, 114, 120, 127, 131, 135, 137];
+            const yellowFillRows = new Set([1, 3, 6, 13, 20, 26, 28, 51, 54, 58, 61, 67, 74, 77, 83, 90, 102, 109, 114, 120, 127, 131, 135, 137]);
 
             for (const rowIdx of mergeRowIndices) {
               if (newData[rowIdx] && newData[rowIdx].length > 1) {
