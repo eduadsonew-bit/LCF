@@ -141,7 +141,7 @@ export default function OrganizacionPage() {
   const autoridades = [
     {
       cargo: "Presidente",
-      nombre: "",
+      nombre: "Fabio Alberto Aristizabal",
       descripcion: "",
       icon: Award,
     },
