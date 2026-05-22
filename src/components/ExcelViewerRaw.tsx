@@ -222,6 +222,7 @@ export default function ExcelViewerRaw({ fileData, fileName }: ExcelViewerProps)
                   alignment: { horizontal: 'center', vertical: 'middle' },
                   ...(isYellow ? { fill: '#FFFF00' } : {}),
                   ...(isYellowFont ? { font: { ...(rowStyle.font || {}), color: '#FFFF00', bold: true } } : {}),
+                  ...(rowIdx === 137 ? { font: { ...(rowStyle.font || {}), color: '#000000' } } : {}),
                 };
                 newData[rowIdx] = newData[rowIdx].map((cell, colIdx) => {
                   if (colIdx === 0) {
