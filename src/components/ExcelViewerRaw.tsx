@@ -208,14 +208,17 @@ export default function ExcelViewerRaw({ fileData, fileName }: ExcelViewerProps)
           if (is23_24Mayo) {
             const totalCols = newData[0]?.length || 1;
             const mergeCols = Math.min(6, totalCols); // A to F = 6 columns
-            const mergeRowIndices = [0, 57]; // rows 1 and 58 (0-indexed)
+            const mergeRowIndices = [0, 1, 57]; // rows 1, 2 and 58 (0-indexed)
+            const yellowFillRows = new Set([1]); // row 2 (0-indexed)
 
             for (const rowIdx of mergeRowIndices) {
               if (newData[rowIdx] && newData[rowIdx].length > 1) {
                 const rowStyle = newData[rowIdx][0]?.style || {};
+                const isYellow = yellowFillRows.has(rowIdx);
                 const customStyle = {
                   ...rowStyle,
                   alignment: { horizontal: 'center', vertical: 'middle' },
+                  ...(isYellow ? { fill: '#FFFF00' } : {}),
                 };
                 newData[rowIdx] = newData[rowIdx].map((cell, colIdx) => {
                   if (colIdx === 0) {
