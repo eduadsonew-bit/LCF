@@ -131,6 +131,9 @@ export default function ExcelViewerRaw({ fileData, fileName }: ExcelViewerProps)
         // Detect if this is the 16,17,18 MAYO file
         const is16_17_18Mayo = fileName.includes('16,17') || fileName.includes('16, 17');
 
+        // Detect if this is the 23 y 24 MAYO file
+        const is23_24Mayo = fileName.includes('23') && fileName.includes('24') && fileName.includes('MAYO');
+
         const processedSheets = parsedSheets.map(sheet => {
           let newData = sheet.data;
           let newWidths = sheet.columnWidths;
@@ -198,6 +201,32 @@ export default function ExcelViewerRaw({ fileData, fileName }: ExcelViewerProps)
                   return { value: null, isMergedSkip: true };
                 });
               }
+            }
+          }
+
+          // Special formatting for 23 y 24 MAYO file: merge row 1 (A to F), center text
+          if (is23_24Mayo) {
+            const totalCols = newData[0]?.length || 1;
+            const mergeCols = Math.min(6, totalCols); // A to F = 6 columns
+            if (newData[0] && newData[0].length > 1) {
+              const rowStyle = newData[0][0]?.style || {};
+              const customStyle = {
+                ...rowStyle,
+                alignment: { horizontal: 'center', vertical: 'middle' },
+              };
+              newData[0] = newData[0].map((cell, colIdx) => {
+                if (colIdx === 0) {
+                  return {
+                    value: cell.value ?? '',
+                    colSpan: mergeCols,
+                    style: customStyle,
+                  };
+                }
+                if (colIdx < mergeCols) {
+                  return { value: null, isMergedSkip: true };
+                }
+                return cell;
+              });
             }
           }
 
