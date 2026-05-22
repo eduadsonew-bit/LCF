@@ -210,15 +210,18 @@ export default function ExcelViewerRaw({ fileData, fileName }: ExcelViewerProps)
             const mergeCols = Math.min(6, totalCols); // A to F = 6 columns
             const mergeRowIndices = [0, 1, 3, 6, 13, 20, 26, 28, 51, 54, 57, 58, 61, 67, 74, 77, 83, 90, 102, 109, 114, 120, 127, 131, 135, 137];
             const yellowFillRows = new Set([1, 3, 6, 13, 20, 26, 28, 51, 54, 58, 61, 67, 74, 77, 83, 90, 102, 109, 114, 120, 127, 131, 135, 137]);
+            const yellowFontRows = new Set([0, 57]); // rows 1 and 58 (0-indexed)
 
             for (const rowIdx of mergeRowIndices) {
               if (newData[rowIdx] && newData[rowIdx].length > 1) {
                 const rowStyle = newData[rowIdx][0]?.style || {};
                 const isYellow = yellowFillRows.has(rowIdx);
+                const isYellowFont = yellowFontRows.has(rowIdx);
                 const customStyle = {
                   ...rowStyle,
                   alignment: { horizontal: 'center', vertical: 'middle' },
                   ...(isYellow ? { fill: '#FFFF00' } : {}),
+                  ...(isYellowFont ? { font: { ...(rowStyle.font || {}), color: '#FFFF00', bold: true } } : {}),
                 };
                 newData[rowIdx] = newData[rowIdx].map((cell, colIdx) => {
                   if (colIdx === 0) {
